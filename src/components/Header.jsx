@@ -17,26 +17,30 @@ const headerVariants = {
   }
 };
 export default function Header() {
-  return <motion.header variants={headerVariants} initial="hidden" animate="visible" className="flex flex-col items-center justify-between gap-4 mb-8 lg:mb-12 sm:flex sm:flex-row">
-      {/* Premium PDFs Banner */}
-      
-
+  return (
+    <motion.header 
+      variants={headerVariants} 
+      initial="hidden" 
+      animate="visible" 
+      className="fixed top-0 right-0 z-50 p-4 md:p-6"
+    >
       {/* Auth Buttons */}
       <div className="flex items-center gap-3">
-        <motion.button whileHover={{
-        scale: 1.05
-      }} whileTap={{
-        scale: 0.95
-      }} className="btn-primary-gradient text-sm px-5 py-2.5">
+        <motion.button 
+          whileHover={{ scale: 1.05 }} 
+          whileTap={{ scale: 0.95 }} 
+          className="btn-primary-gradient text-sm px-5 py-2.5"
+        >
           Sign Up
         </motion.button>
-        <motion.button whileHover={{
-        scale: 1.05
-      }} whileTap={{
-        scale: 0.95
-      }} className="btn-outline-purple text-sm px-5 py-2.5">
+        <motion.button 
+          whileHover={{ scale: 1.05 }} 
+          whileTap={{ scale: 0.95 }} 
+          className="btn-outline-purple text-sm px-5 py-2.5"
+        >
           Login
         </motion.button>
       </div>
-    </motion.header>;
+    </motion.header>
+  );
 }
