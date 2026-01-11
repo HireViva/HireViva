@@ -111,10 +111,10 @@
   }
 
   .glow-orb {
-    position: absolute;
     border-radius: 50%;
     filter: blur(100px);
     opacity: 0.5;
+    will-change: transform, opacity;
     animation: pulse-glow 4s ease-in-out infinite;
   }
 

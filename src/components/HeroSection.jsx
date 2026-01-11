@@ -31,15 +31,6 @@ const fadeUpVariants = {
   },
 };
 
-const glowPulse = {
-  opacity: [0.4, 0.7, 0.4],
-  scale: [1, 1.05, 1],
-  transition: {
-    duration: 3,
-    repeat: Infinity,
-    ease: "easeInOut",
-  },
-};
 
 // Cloud component
 const Cloud = ({ className, delay, duration, startX, endX }) => (
@@ -168,7 +159,7 @@ export default function HeroSection() {
 
   return (
     <>
-      <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 overflow-hidden bg-background">
+      <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 bg-background overflow-visible">
         {/* Animated Clouds */}
         <Cloud 
           className="w-32 h-20 text-white/10 top-10 left-0"
@@ -185,19 +176,6 @@ export default function HeroSection() {
           endX={-100}
         />
 
-        {/* Background Glowing Orb */}
-        <motion.div 
-          animate={glowPulse}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none"
-        >
-          <div className="glow-orb w-full h-full bg-purple-glow/30" />
-        </motion.div>
-        <motion.div 
-          animate={{ ...glowPulse, transition: { ...glowPulse.transition, delay: 1.5 } }}
-          className="absolute top-1/4 right-1/3 w-[400px] h-[400px] pointer-events-none"
-        >
-          <div className="glow-orb w-full h-full bg-cyan-accent/20" />
-        </motion.div>
 
         {/* Text Content - Centered */}
         <motion.div 
