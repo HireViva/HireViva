@@ -168,7 +168,7 @@ export default function HeroSection() {
 
   return (
     <>
-      <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 overflow-hidden">
+      <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 overflow-hidden bg-background">
         {/* Animated Clouds */}
         <Cloud 
           className="w-32 h-20 text-white/10 top-10 left-0"

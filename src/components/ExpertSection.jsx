@@ -60,7 +60,7 @@ const itemVariants = {
 
 export default function ExpertSection() {
   return (
-    <section className="relative py-16 lg:py-24">
+    <section className="relative py-16 lg:py-24 bg-background">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none">
         <div className="glow-orb w-full h-full bg-purple-glow/20" />
