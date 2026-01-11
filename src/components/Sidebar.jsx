@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, 
-  Search, 
   Bot, 
   FileText, 
   BookOpen, 
@@ -19,7 +18,6 @@ const menuSections = [
     title: "MAIN",
     items: [
       { icon: Home, label: "Home", active: true },
-      { icon: Search, label: "Search" },
     ],
   },
   {
