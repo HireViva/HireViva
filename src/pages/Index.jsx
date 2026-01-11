@@ -1,6 +1,8 @@
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import ExpertSection from "@/components/ExpertSection";
+import Footer from "@/components/Footer";
 
 export default function Index() {
   return (
@@ -11,6 +13,8 @@ export default function Index() {
         <div className="max-w-6xl mx-auto pt-12 lg:pt-0">
           <Header />
           <HeroSection />
+          <ExpertSection />
+          <Footer />
         </div>
       </main>
     </div>
