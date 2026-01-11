@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import heroBrain from "@/assets/hero-brain.png";
 
 const textVariants = {
   hidden: { y: 50, opacity: 0 },
@@ -13,21 +12,6 @@ const textVariants = {
       delay: 0.4 + i * 0.1,
     },
   }),
-};
-
-const imageVariants = {
-  hidden: { scale: 0.8, opacity: 0, x: 50 },
-  visible: {
-    scale: 1,
-    opacity: 1,
-    x: 0,
-    transition: {
-      type: "spring",
-      stiffness: 60,
-      damping: 20,
-      delay: 0.6,
-    },
-  },
 };
 
 export default function HeroSection() {
@@ -101,35 +85,6 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Hero Image */}
-      <motion.div
-        variants={imageVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 flex-1 flex justify-center lg:justify-end"
-      >
-        <motion.div
-          animate={{
-            y: [0, -20, 0],
-            rotate: [0, 2, 0, -2, 0],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="relative"
-        >
-          {/* Glow behind image */}
-          <div className="absolute inset-0 bg-purple-glow/30 rounded-full blur-3xl scale-90" />
-          
-          <img
-            src={heroBrain}
-            alt="AI Brain Illustration"
-            className="relative w-64 sm:w-80 md:w-96 lg:w-[450px] h-auto drop-shadow-2xl"
-          />
-        </motion.div>
-      </motion.div>
 
       {/* Decorative star */}
       <motion.div
