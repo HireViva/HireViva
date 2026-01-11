@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import PricingModal from "./PricingModal";
-import heroBrainGears from "@/assets/hero-brain-gears.png";
 
 // GitHub-style staggered fade-up animations
 const containerVariants = {
@@ -29,35 +28,6 @@ const fadeUpVariants = {
       duration: 0.8,
       ease: [0.25, 0.4, 0.25, 1],
     },
-  },
-};
-
-const imageVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.8,
-    y: 60,
-    filter: "blur(20px)",
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: {
-      duration: 1,
-      delay: 0.4,
-      ease: [0.25, 0.4, 0.25, 1],
-    },
-  },
-};
-
-const floatAnimation = {
-  y: [0, -15, 0],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut",
   },
 };
 
@@ -198,7 +168,7 @@ export default function HeroSection() {
 
   return (
     <>
-      <section className="relative flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 py-8 lg:py-16 overflow-hidden">
+      <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 overflow-hidden">
         {/* Animated Clouds */}
         <Cloud 
           className="w-32 h-20 text-white/10 top-10 left-0"
@@ -218,23 +188,23 @@ export default function HeroSection() {
         {/* Background Glowing Orb */}
         <motion.div 
           animate={glowPulse}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none"
         >
           <div className="glow-orb w-full h-full bg-purple-glow/30" />
         </motion.div>
         <motion.div 
           animate={{ ...glowPulse, transition: { ...glowPulse.transition, delay: 1.5 } }}
-          className="absolute top-1/3 right-1/4 w-[300px] h-[300px] pointer-events-none"
+          className="absolute top-1/4 right-1/3 w-[400px] h-[400px] pointer-events-none"
         >
           <div className="glow-orb w-full h-full bg-cyan-accent/20" />
         </motion.div>
 
-        {/* Text Content */}
+        {/* Text Content - Centered */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 flex-1 max-w-2xl text-center lg:text-left"
+          className="relative z-10 max-w-4xl text-center px-4"
         >
           <motion.p
             variants={fadeUpVariants}
@@ -254,7 +224,7 @@ export default function HeroSection() {
 
           <motion.p
             variants={fadeUpVariants}
-            className="text-base sm:text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0"
+            className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
           >
             LastMinuteEngineering is a dedicated platform that helps engineering students 
             excel in exams with Free resources, Concise Notes, MAKAUT PYQs, and smart 
@@ -263,7 +233,7 @@ export default function HeroSection() {
 
           <motion.div
             variants={fadeUpVariants}
-            className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start"
+            className="flex flex-col sm:flex-row items-center gap-4 justify-center"
           >
             <div className="relative">
               {/* Butterfly landing on button */}
@@ -284,28 +254,6 @@ export default function HeroSection() {
             >
               Try AI Interview Free
             </motion.button>
-          </motion.div>
-        </motion.div>
-
-        {/* Hero Image - 3D Brain with Gears and Clouds */}
-        <motion.div
-          variants={imageVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative flex-1 flex items-center justify-center lg:justify-end"
-        >
-          <motion.div
-            animate={floatAnimation}
-            className="relative"
-          >
-            {/* Glow behind image */}
-            <div className="absolute inset-0 bg-gradient-radial from-purple-glow/40 via-purple-glow/10 to-transparent blur-3xl scale-110" />
-            
-            <img 
-              src={heroBrainGears} 
-              alt="3D Brain with Gears and Clouds - Tech Interview Hub Illustration" 
-              className="relative z-10 w-full max-w-md lg:max-w-lg xl:max-w-xl h-auto drop-shadow-2xl"
-            />
           </motion.div>
         </motion.div>
 
