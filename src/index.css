@@ -57,7 +57,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border/0;
   }
 
   body {
@@ -72,7 +72,8 @@
 
 @layer components {
   .glass-card {
-    @apply bg-card/40 backdrop-blur-xl border border-border/50 rounded-xl;
+    @apply bg-card/40 backdrop-blur-xl rounded-xl;
+    border: 1px solid rgba(139, 92, 246, 0.1);
     box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.1);
   }
 
