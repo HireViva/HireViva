@@ -28,7 +28,7 @@ const menuSections = [
       { icon: FileText, label: "Coding Sheet", path: "/coding-sheet" },
       { icon: BookOpen, label: "Core Subject", path: "#" },
       { icon: Star, label: "Aptitude", path: "#" },
-      { icon: MessageSquare, label: "Communication", path: "#" },
+      { icon: MessageSquare, label: "Communication", path: "/communication" },
     ],
   },
   {
