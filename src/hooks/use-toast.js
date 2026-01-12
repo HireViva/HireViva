@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -37,8 +37,8 @@ function toast({ ...props }) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState(memoryState);
-  React.useEffect(() => { listeners.push(setState); return () => { const index = listeners.indexOf(setState); if (index > -1) listeners.splice(index, 1); }; }, [state]);
+  const [state, setState] = useState(memoryState);
+  useEffect(() => { listeners.push(setState); return () => { const index = listeners.indexOf(setState); if (index > -1) listeners.splice(index, 1); }; }, [state]);
   return { ...state, toast, dismiss: (toastId) => dispatch({ type: "DISMISS_TOAST", toastId }) };
 }
 
