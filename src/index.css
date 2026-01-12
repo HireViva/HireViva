@@ -207,6 +207,51 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
   }
+
+  /* Communication Video Library Styles */
+  .video-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border/50 rounded-xl transition-all duration-300;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .video-card:hover {
+    @apply -translate-y-1;
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px hsl(var(--primary) / 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .video-thumbnail-overlay {
+    @apply absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--navy-deep) / 0.3) 0%,
+      hsl(var(--navy-deep) / 0.8) 100%
+    );
+  }
+
+  .video-card:hover .video-thumbnail-overlay {
+    @apply opacity-100;
+  }
+
+  .video-play-btn {
+    @apply w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300;
+    background: hsl(var(--primary) / 0.9);
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.5);
+  }
+
+  .video-play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 50px hsl(var(--primary) / 0.7);
+  }
+
+  .video-frame-glow {
+    border: 1px solid hsl(var(--primary) / 0.8);
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.3),
+                inset 0 0 15px hsl(var(--primary) / 0.1);
+  }
 }
 
 @layer utilities {
