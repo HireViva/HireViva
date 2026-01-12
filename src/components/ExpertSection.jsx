@@ -117,18 +117,6 @@ export default function ExpertSection() {
             </motion.div>
           ))}
         </motion.div>
-
-
-        {/* CTA */}
-        <motion.div variants={itemVariants} className="text-center mt-10">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-outline-purple"
-          >
-            Browse All Experts
-          </motion.button>
-        </motion.div>
       </motion.div>
     </section>
   );
