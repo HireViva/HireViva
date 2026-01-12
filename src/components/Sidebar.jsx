@@ -12,29 +12,30 @@ import {
   X
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const menuSections = [
   {
     title: "MAIN",
     items: [
-      { icon: Home, label: "Home", active: true },
+      { icon: Home, label: "Home", path: "/" },
     ],
   },
   {
     title: "LEARNING & PRACTICE",
     items: [
-      { icon: Bot, label: "AI Interview" },
-      { icon: FileText, label: "Coding Sheet" },
-      { icon: BookOpen, label: "Core Subject" },
-      { icon: Star, label: "Aptitude" },
-      { icon: MessageSquare, label: "Communication" },
+      { icon: Bot, label: "AI Interview", path: "#" },
+      { icon: FileText, label: "Coding Sheet", path: "/coding-sheet" },
+      { icon: BookOpen, label: "Core Subject", path: "#" },
+      { icon: Star, label: "Aptitude", path: "#" },
+      { icon: MessageSquare, label: "Communication", path: "#" },
     ],
   },
   {
     title: "PERFORMANCE & CONNECT",
     items: [
-      { icon: TrendingUp, label: "Progress" },
-      { icon: Users, label: "ExpertTalk" },
+      { icon: TrendingUp, label: "Progress", path: "#" },
+      { icon: Users, label: "ExpertTalk", path: "#" },
     ],
   },
 ];
@@ -156,6 +157,8 @@ export default function Sidebar() {
 }
 
 function SidebarContent({ onItemClick }) {
+  const location = useLocation();
+  
   return (
     <>
       {/* Logo */}
@@ -176,21 +179,21 @@ function SidebarContent({ onItemClick }) {
           </h3>
           <nav className="space-y-1">
             {section.items.map((item) => (
-              <motion.a
+              <Link
                 key={item.label}
-                href="#"
-                variants={itemVariants}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`sidebar-item ${item.active ? "active" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (onItemClick) onItemClick();
-                }}
+                to={item.path}
+                onClick={onItemClick}
               >
-                <item.icon size={20} />
-                <span className="font-medium">{item.label}</span>
-              </motion.a>
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
+                >
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                </motion.div>
+              </Link>
             ))}
           </nav>
         </motion.div>
