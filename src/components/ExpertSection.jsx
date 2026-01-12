@@ -118,28 +118,6 @@ export default function ExpertSection() {
           ))}
         </motion.div>
 
-        {/* Features */}
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-6"
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.label}
-              variants={itemVariants}
-              whileHover={{ scale: 1.03 }}
-              className="glass-card p-6 flex items-center gap-4"
-            >
-              <div className="w-12 h-12 rounded-xl bg-purple-glow/20 flex items-center justify-center flex-shrink-0">
-                <feature.icon className="text-purple-glow" size={24} />
-              </div>
-              <div>
-                <h4 className="font-semibold text-foreground mb-1">{feature.label}</h4>
-                <p className="text-muted-foreground text-sm">{feature.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
 
         {/* CTA */}
         <motion.div variants={itemVariants} className="text-center mt-10">
