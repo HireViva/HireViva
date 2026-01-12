@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Play, ArrowLeft, Video, Sparkles } from 'lucide-react';
 import { YOUTUBE_LINKS } from '@/data/videoConfig';
 
@@ -147,6 +148,7 @@ const CinemaMode = ({ video, onClose }) => {
 
 const Communication = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const navigate = useNavigate();
 
   const handleVideoClick = (video) => {
     setSelectedVideo(video);
@@ -154,6 +156,10 @@ const Communication = () => {
 
   const handleCloseCinema = () => {
     setSelectedVideo(null);
+  };
+
+  const handleBackToHome = () => {
+    navigate('/');
   };
 
   // Cinema Mode
@@ -173,18 +179,28 @@ const Communication = () => {
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-background/50">
         <div className="container mx-auto px-4 py-4 md:py-6">
           <div className="flex items-center justify-between">
-            {/* Logo / Title */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
-                <Video className="w-5 h-5 md:w-6 md:h-6 text-background" />
-              </div>
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-foreground">
-                  Video <span className="text-gradient-purple">Library</span>
-                </h1>
-                <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
-                  Communication Learning Hub
-                </p>
+            {/* Back Button + Logo / Title */}
+            <div className="flex items-center gap-4">
+              {/* Back Button */}
+              <button
+                onClick={handleBackToHome}
+                className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-card border border-border/50 flex items-center justify-center hover:bg-muted/50 hover:border-primary/50 transition-all duration-300 group"
+              >
+                <ArrowLeft className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+              </button>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
+                  <Video className="w-5 h-5 md:w-6 md:h-6 text-background" />
+                </div>
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold text-foreground">
+                    Video <span className="text-gradient-purple">Library</span>
+                  </h1>
+                  <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
+                    Communication Learning Hub
+                  </p>
+                </div>
               </div>
             </div>
           </div>
