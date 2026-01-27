@@ -130,14 +130,11 @@ export default function Sidebar() {
       </AnimatePresence>
 
       {/* Desktop Sidebar - Always visible on lg+ */}
-      <motion.aside
-        variants={sidebarVariants}
-        initial="hidden"
-        animate="visible"
-        className="hidden lg:block fixed lg:relative top-0 left-0 h-screen w-64 bg-sidebar/60 backdrop-blur-xl border-r border-border/30 p-4 overflow-y-auto z-40"
+      <aside
+        className="hidden lg:block fixed top-0 left-0 h-screen w-64 bg-sidebar/60 backdrop-blur-xl border-r border-border/30 p-4 overflow-y-auto z-40"
       >
-        <SidebarContent />
-      </motion.aside>
+        <SidebarContent animate={false} />
+      </aside>
 
       {/* Mobile Sidebar - Controlled by isOpen */}
       <AnimatePresence>
@@ -149,7 +146,7 @@ export default function Sidebar() {
             exit="exit"
             className="lg:hidden fixed top-0 left-0 h-screen w-64 bg-sidebar/95 backdrop-blur-xl border-r border-border/30 p-4 overflow-y-auto z-40"
           >
-            <SidebarContent onItemClick={() => setIsOpen(false)} />
+            <SidebarContent animate={true} onItemClick={() => setIsOpen(false)} />
           </motion.aside>
         )}
       </AnimatePresence>
@@ -157,15 +154,18 @@ export default function Sidebar() {
   );
 }
 
-function SidebarContent({ onItemClick }) {
+function SidebarContent({ animate = true, onItemClick }) {
   const location = useLocation();
   const { user } = useAuth();
+
+  const Wrapper = animate ? motion.div : 'div';
+  const wrapperProps = animate ? { variants: itemVariants } : {};
 
   return (
     <>
       {/* Logo / User Avatar */}
-      <motion.div
-        variants={itemVariants}
+      <Wrapper
+        {...wrapperProps}
         className="flex items-center gap-3 mb-8 mt-2"
       >
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center">
@@ -173,11 +173,11 @@ function SidebarContent({ onItemClick }) {
             {user ? user.name?.charAt(0).toUpperCase() : 'L'}
           </span>
         </div>
-      </motion.div>
+      </Wrapper>
 
       {/* Menu Sections */}
       {menuSections.map((section) => (
-        <motion.div key={section.title} variants={itemVariants} className="mb-6">
+        <Wrapper key={section.title} {...wrapperProps} className="mb-6">
           <h3 className="text-xs font-semibold text-muted-foreground mb-3 tracking-wider">
             {section.title}
           </h3>
@@ -188,19 +188,28 @@ function SidebarContent({ onItemClick }) {
                 to={item.path}
                 onClick={onItemClick}
               >
-                <motion.div
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
-                >
-                  <item.icon size={20} />
-                  <span className="font-medium">{item.label}</span>
-                </motion.div>
+                {animate ? (
+                  <motion.div
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
+                  >
+                    <item.icon size={20} />
+                    <span className="font-medium">{item.label}</span>
+                  </motion.div>
+                ) : (
+                  <div
+                    className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
+                  >
+                    <item.icon size={20} />
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                )}
               </Link>
             ))}
           </nav>
-        </motion.div>
+        </Wrapper>
       ))}
     </>
   );
