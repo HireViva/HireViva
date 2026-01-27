@@ -304,3 +304,49 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--purple-glow) / 0.7);
 }
+
+/* Authentication Styles */
+@layer components {
+  .auth-input:focus {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }
+
+  .slide-in-from-bottom-4 {
+    animation-name: slideInFromBottom;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(1rem);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .duration-700 {
+    animation-duration: 700ms;
+  }
+}

@@ -1,18 +1,19 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Home, 
-  Bot, 
-  FileText, 
-  BookOpen, 
-  Star, 
-  MessageSquare, 
-  TrendingUp, 
+import {
+  Home,
+  Bot,
+  FileText,
+  BookOpen,
+  Star,
+  MessageSquare,
+  TrendingUp,
   Users,
   Menu,
   X
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const menuSections = [
   {
@@ -158,16 +159,19 @@ export default function Sidebar() {
 
 function SidebarContent({ onItemClick }) {
   const location = useLocation();
-  
+  const { user } = useAuth();
+
   return (
     <>
-      {/* Logo */}
+      {/* Logo / User Avatar */}
       <motion.div
         variants={itemVariants}
         className="flex items-center gap-3 mb-8 mt-2"
       >
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center">
-          <span className="text-foreground font-bold text-lg">L</span>
+          <span className="text-foreground font-bold text-lg">
+            {user ? user.name?.charAt(0).toUpperCase() : 'L'}
+          </span>
         </div>
       </motion.div>
 
