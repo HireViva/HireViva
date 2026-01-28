@@ -31,25 +31,23 @@ export const QuestionRow = ({
   };
 
   return (
-    <motion.tr
+    <tr
       id={rowId}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03, duration: 0.3 }}
-      className="table-row-hover border-b border-border/30 group transition-all duration-300"
+      className="table-row-hover border-b border-border/30 group"
+      style={{ willChange: 'auto', transform: 'translateZ(0)' }}
     >
       {/* Checkbox */}
-      <td className="py-4 px-4">
+      <td className="py-2 px-4">
         <GlowCheckbox checked={isSolved} onChange={handleSolvedToggle} />
       </td>
 
       {/* ID */}
-      <td className="py-4 px-3 font-mono text-muted-foreground text-sm">
+      <td className="py-2 px-3 font-mono text-muted-foreground text-sm">
         {question.id}
       </td>
 
       {/* Question Title */}
-      <td className="py-4 px-4">
+      <td className="py-2 px-4">
         <span
           className={`text-foreground transition-all duration-300 ${isSolved ? 'line-through-animated text-muted-foreground' : ''
             }`}
@@ -59,7 +57,7 @@ export const QuestionRow = ({
       </td>
 
       {/* Links */}
-      <td className="py-4 px-4">
+      <td className="py-2 px-4">
         <div className="flex items-center justify-center gap-2">
           {question.links.leetcode && (
             <LinkButton href={question.links.leetcode} />
@@ -68,7 +66,7 @@ export const QuestionRow = ({
       </td>
 
       {/* Star */}
-      <td className="py-4 px-4">
+      <td className="py-2 px-4">
         <div className="flex items-center justify-center">
           <motion.button
             whileHover={{ scale: 1.2 }}
@@ -87,7 +85,7 @@ export const QuestionRow = ({
       </td>
 
       {/* Note */}
-      <td className="py-4 px-4">
+      <td className="py-2 px-4">
         <div className="flex items-center justify-center">
           <motion.button
             whileHover={{ scale: 1.2 }}
@@ -104,6 +102,6 @@ export const QuestionRow = ({
           </motion.button>
         </div>
       </td>
-    </motion.tr>
+    </tr>
   );
 };

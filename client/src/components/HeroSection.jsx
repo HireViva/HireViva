@@ -15,8 +15,8 @@ const containerVariants = {
 };
 
 const fadeUpVariants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     y: 40,
     filter: "blur(10px)",
   },
@@ -36,8 +36,8 @@ const fadeUpVariants = {
 const Cloud = ({ className, delay, duration, startX, endX }) => (
   <motion.div
     initial={{ x: startX, opacity: 0 }}
-    animate={{ 
-      x: endX, 
+    animate={{
+      x: endX,
       opacity: [0, 0.8, 0.8, 0],
     }}
     transition={{
@@ -61,7 +61,7 @@ const Butterfly = () => {
   return (
     <motion.div
       initial={{ x: -200, y: -150, opacity: 0, scale: 0.5 }}
-      animate={{ 
+      animate={{
         x: [null, -100, -50, 0, 10, 5],
         y: [null, -100, -50, -20, 0, -5],
         opacity: [0, 1, 1, 1, 1, 1],
@@ -76,11 +76,11 @@ const Butterfly = () => {
       }}
       className="absolute -top-8 -left-4 z-20"
     >
-      <motion.svg 
-        width="40" 
-        height="35" 
+      <motion.svg
+        width="40"
+        height="35"
         viewBox="0 0 50 40"
-        animate={{ 
+        animate={{
           y: [0, -2, 0, -1, 0],
         }}
         transition={{
@@ -94,7 +94,7 @@ const Butterfly = () => {
         <motion.path
           d="M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20"
           fill="url(#wingGradient1)"
-          animate={{ 
+          animate={{
             d: [
               "M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20",
               "M25 20 C18 15, 10 18, 12 24 C14 28, 21 26, 25 20",
@@ -111,7 +111,7 @@ const Butterfly = () => {
         <motion.path
           d="M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20"
           fill="url(#wingGradient2)"
-          animate={{ 
+          animate={{
             d: [
               "M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20",
               "M25 20 C32 15, 40 18, 38 24 C36 28, 29 26, 25 20",
@@ -161,14 +161,14 @@ export default function HeroSection() {
     <>
       <section className="relative flex items-center justify-center min-h-[70vh] py-12 lg:py-20 bg-background overflow-visible">
         {/* Animated Clouds */}
-        <Cloud 
+        <Cloud
           className="w-32 h-20 text-white/10 top-10 left-0"
           delay={0.5}
           duration={8}
           startX={-150}
           endX={200}
         />
-        <Cloud 
+        <Cloud
           className="w-40 h-24 text-purple-glow/15 top-24 right-0"
           delay={1}
           duration={10}
@@ -178,7 +178,7 @@ export default function HeroSection() {
 
 
         {/* Text Content - Centered */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -186,9 +186,26 @@ export default function HeroSection() {
         >
           <motion.p
             variants={fadeUpVariants}
-            className="brand-text text-xl sm:text-2xl font-semibold mb-4"
+            className="brand-text text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-glow via-cyan-accent to-pink-500 bg-clip-text text-transparent"
+            animate={{
+              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              scale: [1, 1.02, 1],
+            }}
+            transition={{
+              backgroundPosition: {
+                duration: 4,
+                repeat: Infinity,
+                ease: "linear"
+              },
+              scale: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            style={{ backgroundSize: '200% 200%' }}
           >
-            LastMinuteEngineering
+            HireViva
           </motion.p>
 
           <motion.h1
@@ -204,8 +221,8 @@ export default function HeroSection() {
             variants={fadeUpVariants}
             className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
           >
-            LastMinuteEngineering is a dedicated platform that helps engineering students 
-            excel in exams with Free resources, Concise Notes, MAKAUT PYQs, and smart 
+            HireViva is a dedicated platform that helps engineering students
+            excel in exams with Free resources, Concise Notes, MAKAUT PYQs, and smart
             topic-focused Suggestions. We make Preparation Easier and more Effective.
           </motion.p>
 
@@ -240,7 +257,7 @@ export default function HeroSection() {
           <motion.div
             key={i}
             initial={{ opacity: 0 }}
-            animate={{ 
+            animate={{
               opacity: [0, 0.6, 0],
               y: [0, -100],
               x: [0, (i % 2 === 0 ? 20 : -20)],
@@ -259,7 +276,7 @@ export default function HeroSection() {
           />
         ))}
       </section>
-      
+
       {/* Pricing Modal */}
       <PricingModal isOpen={isPricingOpen} onClose={() => setIsPricingOpen(false)} />
     </>

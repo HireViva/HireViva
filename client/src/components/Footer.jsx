@@ -103,10 +103,23 @@ export default function Footer() {
           {/* Brand & Newsletter */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center">
-                <span className="text-foreground font-bold text-lg">L</span>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center">
+                <span className="text-foreground font-bold text-xl">H</span>
               </div>
-              <span className="brand-text text-xl font-bold">LastMinuteEngineering</span>
+              <motion.span 
+                className="brand-text text-3xl font-bold bg-gradient-to-r from-purple-glow via-cyan-accent to-pink-500 bg-clip-text text-transparent"
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{ backgroundSize: '200% 200%' }}
+              >
+                HireViva
+              </motion.span>
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm">
               Your comprehensive tech interview hub. Helping engineering students excel with free resources and smart preparation tools.
@@ -218,7 +231,7 @@ export default function Footer() {
           className="pt-8 border-t border-border/30 flex flex-col sm:flex-row items-center justify-between gap-4"
         >
           <p className="text-muted-foreground text-sm">
-            © 2025 LastMinuteEngineering. All rights reserved.
+            © 2025 HireViva. All rights reserved.
           </p>
 
           {/* Social Links */}
