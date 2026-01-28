@@ -76,15 +76,15 @@ export const DSATracker = () => {
     : null;
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-3 sm:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-3">
         {/* Header with Stats */}
         <motion.header
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6"
+          className="flex flex-col sm:flex-row items-center justify-between gap-3 py-3"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link to="/">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -94,7 +94,7 @@ export const DSATracker = () => {
                 <ArrowLeft className="w-5 h-5" />
               </motion.button>
             </Link>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               <span className="text-primary">CODING</span>
               <span className="text-muted-foreground/40">/</span>
               <span className="text-foreground">SHEET</span>
@@ -102,7 +102,7 @@ export const DSATracker = () => {
           </div>
 
           {/* Stats Badge - Top Right */}
-          <div className="flex items-center gap-4 glass-card px-4 py-2">
+          <div className="flex items-center gap-3 glass-card px-3 py-1.5">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">Progress</span>
               <span className="text-primary font-mono font-semibold">
@@ -135,31 +135,43 @@ export const DSATracker = () => {
         />
 
         {/* Questions Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+        <div
           className="glass-card overflow-hidden"
+          style={{ transform: 'translateZ(0)', willChange: 'auto' }}
         >
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full">
+          <div
+            className="overflow-x-auto custom-scrollbar"
+            style={{
+              transform: 'translateZ(0)',
+              WebkitOverflowScrolling: 'touch',
+              overflowY: 'auto',
+              maxHeight: 'calc(100vh - 180px)'
+            }}
+          >
+            <table
+              className="w-full"
+              style={{
+                transform: 'translateZ(0)',
+                contain: 'layout style paint'
+              }}
+            >
               <thead>
                 <tr className="border-b border-border/50">
-                  <th className="py-4 px-4 text-left w-12">
+                  <th className="py-2 px-4 text-left w-12">
                   </th>
-                  <th className="py-4 px-3 text-left font-mono text-muted-foreground text-sm">
+                  <th className="py-2 px-3 text-left font-mono text-muted-foreground text-sm">
                     id
                   </th>
-                  <th className="py-4 px-4 text-center text-muted-foreground font-medium">
+                  <th className="py-2 px-4 text-center text-muted-foreground font-medium">
                     Questions
                   </th>
-                  <th className="py-4 px-4 text-center text-muted-foreground font-medium">
+                  <th className="py-2 px-4 text-center text-muted-foreground font-medium">
                     Links
                   </th>
-                  <th className="py-4 px-4 text-center text-muted-foreground font-medium">
+                  <th className="py-2 px-4 text-center text-muted-foreground font-medium">
                     Star
                   </th>
-                  <th className="py-4 px-4 text-center text-muted-foreground font-medium">
+                  <th className="py-2 px-4 text-center text-muted-foreground font-medium">
                     Note
                   </th>
                 </tr>
@@ -187,7 +199,7 @@ export const DSATracker = () => {
               No questions found matching "{searchQuery}"
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* Note Modal */}
