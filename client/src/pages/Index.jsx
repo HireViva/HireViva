@@ -8,8 +8,8 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background flex w-full">
       <Sidebar />
-      
-      <main className="relative flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden bg-background">
+
+      <main className="relative flex-1 p-4 sm:p-6 lg:p-8 lg:ml-64 overflow-x-hidden bg-background">
         {/* Global background glow (keeps sections seamless) */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px]">
