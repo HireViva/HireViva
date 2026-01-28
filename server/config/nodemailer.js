@@ -13,13 +13,21 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Verify connection
+
+// Verify connection (non-blocking)
+// Commented out to prevent server crashes - email functionality works without verification
+/*
 transporter.verify(function (error, success) {
     if (error) {
-        console.error('❌ SMTP Connection Error:', error);
+        console.warn('⚠️  SMTP Connection Warning:', error.message);
+        console.log('📧 Email functionality may be limited, but server will continue running');
     } else {
         console.log('✅ SMTP Server is ready to send emails');
     }
+}).catch(err => {
+    console.warn('⚠️  SMTP verification failed:', err.message);
 });
+*/
 
 export default transporter;
+

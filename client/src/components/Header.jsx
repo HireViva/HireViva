@@ -34,17 +34,8 @@ export default function Header() {
       {user ? (
         // When logged in: Avatar on left, Logout on right
         <>
-          {/* User Avatar - Left Side */}
-          <motion.div
-            variants={headerVariants}
-            initial="hidden"
-            animate="visible"
-            className="fixed top-0 left-0 z-50 p-4 md:p-6"
-          >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              {user.name?.charAt(0).toUpperCase()}
-            </div>
-          </motion.div>
+
+
 
           {/* Logout Button - Right Side */}
           <motion.div
@@ -57,7 +48,7 @@ export default function Header() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLogout}
-              className="btn-outline-purple text-sm px-5 py-2.5 flex items-center gap-2"
+              className="btn-outline-purple text-sm px-5 py-2.5 flex items-center gap-2 bg-background/95 backdrop-blur-xl"
               title="Logout"
             >
               <LogOut size={16} />

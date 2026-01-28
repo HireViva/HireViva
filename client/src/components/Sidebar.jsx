@@ -163,16 +163,17 @@ function SidebarContent({ animate = true, onItemClick }) {
 
   return (
     <>
-      {/* Logo / User Avatar */}
+      {/* User Info */}
       <Wrapper
         {...wrapperProps}
-        className="flex items-center gap-3 mb-8 mt-2"
+        className="flex flex-col gap-1 mb-8 mt-2 p-3 rounded-xl bg-sidebar-accent/30 border border-sidebar-border/30"
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-glow to-cyan-accent flex items-center justify-center">
-          <span className="text-foreground font-bold text-lg">
-            {user ? user.name?.charAt(0).toUpperCase() : 'L'}
-          </span>
-        </div>
+        <span className="text-foreground font-semibold text-sm truncate">
+          {user ? user.name : 'Guest'}
+        </span>
+        <span className="text-muted-foreground text-xs truncate">
+          {user ? user.email : 'Not logged in'}
+        </span>
       </Wrapper>
 
       {/* Menu Sections */}
