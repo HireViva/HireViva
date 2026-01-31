@@ -6,6 +6,7 @@ import connectDB from './config/mongodb.js';
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import progressRouter from './routes/progressRoutes.js';
+import quizRouter from './routes/quizRoutes.js';
 
 
 const app = express();
@@ -24,6 +25,7 @@ app.get("/", (req, res) => res.send("AI Interview Platform Server is running!"))
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/progress', progressRouter);
+app.use('/api/quiz', quizRouter);
 
 
 app.listen(PORT, () => {

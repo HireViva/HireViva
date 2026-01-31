@@ -33,6 +33,14 @@ const userSchema = new mongoose.Schema({
     resetOtpExpireAt: {
         type: Number,
         default: 0,
+    },
+    quizStats: {
+        totalAttempts: { type: Number, default: 0 },
+        totalCompleted: { type: Number, default: 0 },
+        averageScore: { type: Number, default: 0 },
+        bestScore: { type: Number, default: 0 },
+        totalTimeSpent: { type: Number, default: 0 }, // in minutes
+        lastAttemptDate: { type: Date }
     }
 });
 
