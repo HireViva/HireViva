@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { checkAuth } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
@@ -38,7 +39,10 @@ export default function Login() {
             if (response.data.success) {
                 toast.success(response.data.message);
                 await checkAuth(); // Refresh auth state
-                navigate('/');
+
+                // Redirect to return URL if present, otherwise go to home
+                const returnUrl = location.state?.returnUrl || '/';
+                navigate(returnUrl, { replace: true });
             } else {
                 toast.error(response.data.message);
             }
