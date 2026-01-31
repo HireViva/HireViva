@@ -1,12 +1,12 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
     secure: false, // Use TLS
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
     tls: {
         rejectUnauthorized: false // For development
@@ -14,20 +14,24 @@ const transporter = nodemailer.createTransport({
 });
 
 
+
 // Verify connection (non-blocking)
-// Commented out to prevent server crashes - email functionality works without verification
-/*
-transporter.verify(function (error, success) {
-    if (error) {
-        console.warn('⚠️  SMTP Connection Warning:', error.message);
-        console.log('📧 Email functionality may be limited, but server will continue running');
-    } else {
+(async () => {
+    try {
+        await transporter.verify();
         console.log('✅ SMTP Server is ready to send emails');
+    } catch (error) {
+        console.error('❌ SMTP Connection Error:', error.message);
+        console.error('Full error:', error);
+        console.log('📧 Email configuration:');
+        console.log('  - Host:', process.env.EMAIL_HOST);
+        console.log('  - Port:', process.env.EMAIL_PORT);
+        console.log('  - User:', process.env.EMAIL_USER);
+        console.log('  - Pass length:', process.env.EMAIL_PASS?.length || 0);
     }
-}).catch(err => {
-    console.warn('⚠️  SMTP verification failed:', err.message);
-});
-*/
+})();
+
 
 export default transporter;
+
 
