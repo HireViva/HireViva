@@ -38,7 +38,15 @@ const menuSections = [
           { label: "Mock Test", path: "/mock-test" }
         ]
       },
-      { icon: Star, label: "Aptitude", path: "#" },
+      {
+        icon: Star,
+        label: "Aptitude",
+        path: "#",
+        subItems: [
+          { label: "Study Material", path: "/aptitude-study-material" },
+          { label: "Mock Test", path: "/aptitude-mock-test" }
+        ]
+      },
       { icon: MessageSquare, label: "Communication", path: "/communication" },
     ],
   },

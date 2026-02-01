@@ -21,6 +21,7 @@ import Pricing from "./pages/Pricing.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsAndConditions from "./pages/TermsAndConditions.jsx";
 import CancellationAndRefundPolicy from "./pages/CancellationAndRefundPolicy.jsx";
+import StudyMaterial from "./pages/StudyMaterial.jsx";
 import MockTestDashboard from "./pages/test/MockTestDashboard.jsx";
 import StartTest from "./pages/test/StartTest.jsx";
 import Test from "./pages/test/Test.jsx";
@@ -29,6 +30,11 @@ import AIInterviewLanding from "./pages/ai-interview/LandingPage.jsx";
 import InterviewSetup from "./pages/ai-interview/InterviewSetup.jsx";
 import InterviewRoom from "./pages/ai-interview/InterviewRoom.jsx";
 import InterviewResults from "./pages/ai-interview/InterviewResults.jsx";
+import AptitudeStudyMaterial from "./pages/AptitudeStudyMaterial.jsx";
+import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
+import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
+import AptitudeTest from "./pages/AptitudeTest.jsx";
+import AptitudeResult from "./pages/AptitudeResult.jsx";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +59,10 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
             <Route path="/cancellation-and-refund-policy" element={<CancellationAndRefundPolicy />} />
+            <Route path="/study-material" element={<StudyMaterial />} />
+
+            {/* Core Subject Routes - Protected */}
+            <Route path="/study-material" element={<ProtectedRoute><StudyMaterial /></ProtectedRoute>} />
 
             {/* Mock Test Routes - Protected */}
             <Route path="/mock-test" element={<ProtectedRoute><MockTestDashboard /></ProtectedRoute>} />
@@ -65,6 +75,12 @@ const App = () => (
             <Route path="/ai-interview/setup" element={<InterviewSetup />} />
             <Route path="/ai-interview/room" element={<InterviewRoom />} />
             <Route path="/ai-interview/results/:id" element={<InterviewResults />} />
+            {/* Aptitude Routes - Protected */}
+            <Route path="/aptitude-study-material" element={<ProtectedRoute><AptitudeStudyMaterial /></ProtectedRoute>} />
+            <Route path="/aptitude-mock-test" element={<ProtectedRoute><AptitudeMockTestDashboard /></ProtectedRoute>} />
+            <Route path="/aptitude-mock-test/:testId/start" element={<ProtectedRoute><AptitudeStartTest /></ProtectedRoute>} />
+            <Route path="/aptitude-mock-test/:testId/attempt" element={<ProtectedRoute><AptitudeTest /></ProtectedRoute>} />
+            <Route path="/aptitude-mock-test/:testId/result" element={<ProtectedRoute><AptitudeResult /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

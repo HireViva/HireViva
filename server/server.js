@@ -9,6 +9,7 @@ import progressRouter from './routes/progressRoutes.js';
 import quizRouter from './routes/quizRoutes.js';
 import interviewRouter from './routes/interviewRoutes.js';
 import resumeRouter from './routes/resumeRoutes.js';
+import aptitudeQuizRouter from './routes/aptitudeQuizRoutes.js';
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/progress', progressRouter);
 app.use('/api/quiz', quizRouter);
 app.use('/api/interview', interviewRouter);
 app.use('/api/resume', resumeRouter);
+app.use('/api/aptitude-quiz', aptitudeQuizRouter);
 
 
 app.listen(PORT, () => {
