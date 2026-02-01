@@ -9,7 +9,9 @@ import {
   TrendingUp,
   Users,
   Menu,
-  X
+  X,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -27,7 +29,15 @@ const menuSections = [
     items: [
       { icon: Bot, label: "AI Interview", path: "#" },
       { icon: FileText, label: "Coding Sheet", path: "/coding-sheet" },
-      { icon: BookOpen, label: "Core Subject", path: "#" },
+      { 
+        icon: BookOpen, 
+        label: "Core Subject", 
+        path: "#",
+        subItems: [
+          { label: "Study Material", path: "/study-material" },
+          { label: "Mock Test", path: "/mock-test" }
+        ]
+      },
       { icon: Star, label: "Aptitude", path: "#" },
       { icon: MessageSquare, label: "Communication", path: "/communication" },
     ],
@@ -155,9 +165,8 @@ export default function Sidebar() {
 }
 
 function SidebarContent({ animate = true, onItemClick }) {
-  const location = useLocation();
   const { user } = useAuth();
-
+  
   const Wrapper = animate ? motion.div : 'div';
   const wrapperProps = animate ? { variants: itemVariants } : {};
 
@@ -184,34 +193,102 @@ function SidebarContent({ animate = true, onItemClick }) {
           </h3>
           <nav className="space-y-1">
             {section.items.map((item) => (
-              <Link
-                key={item.label}
-                to={item.path}
-                onClick={onItemClick}
-              >
-                {animate ? (
-                  <motion.div
-                    variants={itemVariants}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
-                  >
-                    <item.icon size={20} />
-                    <span className="font-medium">{item.label}</span>
-                  </motion.div>
-                ) : (
-                  <div
-                    className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
-                  >
-                    <item.icon size={20} />
-                    <span className="font-medium">{item.label}</span>
-                  </div>
-                )}
-              </Link>
+              <SidebarItem 
+                key={item.label} 
+                item={item} 
+                animate={animate} 
+                onItemClick={onItemClick} 
+              />
             ))}
           </nav>
         </Wrapper>
       ))}
     </>
+  );
+}
+
+function SidebarItem({ item, animate, onItemClick }) {
+  const location = useLocation();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isActive = location.pathname === item.path || (item.subItems && item.subItems.some(sub => location.pathname === sub.path));
+
+  const handleClick = (e) => {
+    if (item.subItems) {
+      e.preventDefault();
+      setIsExpanded(!isExpanded);
+    } else {
+      if (onItemClick) onItemClick();
+    }
+  };
+
+  return (
+    <div className="mb-1">
+      <Link
+        to={item.path}
+        onClick={handleClick}
+        className="block"
+      >
+        {animate ? (
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`sidebar-item flex items-center justify-between ${isActive ? "active" : ""}`}
+          >
+            <div className="flex items-center gap-3">
+              <item.icon size={20} />
+              <span className="font-medium">{item.label}</span>
+            </div>
+            {item.subItems && (
+              <motion.div
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown size={16} />
+              </motion.div>
+            )}
+          </motion.div>
+        ) : (
+          <div
+            className={`sidebar-item flex items-center justify-between ${isActive ? "active" : ""}`}
+          >
+             <div className="flex items-center gap-3">
+              <item.icon size={20} />
+              <span className="font-medium">{item.label}</span>
+            </div>
+            {item.subItems && (
+               <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                 <ChevronDown size={16} />
+               </div>
+            )}
+          </div>
+        )}
+      </Link>
+      
+      <AnimatePresence>
+        {item.subItems && isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden ml-4 pl-4 border-l border-border/30 mt-1 space-y-1"
+          >
+            {item.subItems.map((subItem) => (
+              <Link
+                key={subItem.label}
+                to={subItem.path}
+                onClick={onItemClick}
+                className={`block py-2 px-2 text-sm rounded-lg hover:text-primary hover:bg-sidebar-accent/50 transition-colors ${
+                  location.pathname === subItem.path ? "text-primary bg-sidebar-accent/50 font-medium" : "text-muted-foreground"
+                }`}
+              >
+                {subItem.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

@@ -26,18 +26,25 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        // Sending welcome email
+        // Sending welcome email (non-blocking)
         const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to AI Interview Platform',
             text: `${user.name}, your account has been created successfully at ${email}`
         };
-        await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: 'User Registered Successfully' });
+
+        // Send email asynchronously without blocking the response
+        transporter.sendMail(mailOptions).catch(err => {
+            console.error('Failed to send welcome email:', err.message);
+        });
+
+        // Return success immediately, don't wait for email
+        return res.json({ success: true, message: 'User Registered Successfully' });
 
     } catch (error) {
-        res.json({ success: false, message: error.message });
+        console.error('Registration error:', error);
+        return res.json({ success: false, message: error.message });
     }
 };
 
