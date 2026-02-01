@@ -26,12 +26,6 @@ import MockTestDashboard from "./pages/test/MockTestDashboard.jsx";
 import StartTest from "./pages/test/StartTest.jsx";
 import Test from "./pages/test/Test.jsx";
 import Result from "./pages/test/Result.jsx";
-import AptitudeStudyMaterial from "./pages/AptitudeStudyMaterial.jsx";
-import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
-import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
-import AptitudeTest from "./pages/AptitudeTest.jsx";
-import AptitudeResult from "./pages/AptitudeResult.jsx";
-import StudyMaterial from "./pages/StudyMaterial.jsx";
 
 const queryClient = new QueryClient();
 
@@ -58,21 +52,11 @@ const App = () => (
             <Route path="/cancellation-and-refund-policy" element={<CancellationAndRefundPolicy />} />
             <Route path="/study-material" element={<StudyMaterial />} />
 
-            {/* Core Subject Routes - Protected */}
-            <Route path="/study-material" element={<ProtectedRoute><StudyMaterial /></ProtectedRoute>} />
-
             {/* Mock Test Routes - Protected */}
             <Route path="/mock-test" element={<ProtectedRoute><MockTestDashboard /></ProtectedRoute>} />
             <Route path="/mock-test/:testId/start" element={<ProtectedRoute><StartTest /></ProtectedRoute>} />
             <Route path="/mock-test/:testId/attempt" element={<ProtectedRoute><Test /></ProtectedRoute>} />
             <Route path="/mock-test/:testId/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
-
-            {/* Aptitude Routes - Protected */}
-            <Route path="/aptitude-study-material" element={<ProtectedRoute><AptitudeStudyMaterial /></ProtectedRoute>} />
-            <Route path="/aptitude-mock-test" element={<ProtectedRoute><AptitudeMockTestDashboard /></ProtectedRoute>} />
-            <Route path="/aptitude-mock-test/:testId/start" element={<ProtectedRoute><AptitudeStartTest /></ProtectedRoute>} />
-            <Route path="/aptitude-mock-test/:testId/attempt" element={<ProtectedRoute><AptitudeTest /></ProtectedRoute>} />
-            <Route path="/aptitude-mock-test/:testId/result" element={<ProtectedRoute><AptitudeResult /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

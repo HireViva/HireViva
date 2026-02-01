@@ -29,24 +29,16 @@ const menuSections = [
     items: [
       { icon: Bot, label: "AI Interview", path: "#" },
       { icon: FileText, label: "Coding Sheet", path: "/coding-sheet" },
-      {
-        icon: BookOpen,
-        label: "Core Subject",
+      { 
+        icon: BookOpen, 
+        label: "Core Subject", 
         path: "#",
         subItems: [
           { label: "Study Material", path: "/study-material" },
           { label: "Mock Test", path: "/mock-test" }
         ]
       },
-      {
-        icon: Star,
-        label: "Aptitude",
-        path: "#",
-        subItems: [
-          { label: "Study Material", path: "/aptitude-study-material" },
-          { label: "Mock Test", path: "/aptitude-mock-test" }
-        ]
-      },
+      { icon: Star, label: "Aptitude", path: "#" },
       { icon: MessageSquare, label: "Communication", path: "/communication" },
     ],
   },
@@ -174,7 +166,7 @@ export default function Sidebar() {
 
 function SidebarContent({ animate = true, onItemClick }) {
   const { user } = useAuth();
-
+  
   const Wrapper = animate ? motion.div : 'div';
   const wrapperProps = animate ? { variants: itemVariants } : {};
 
@@ -201,11 +193,11 @@ function SidebarContent({ animate = true, onItemClick }) {
           </h3>
           <nav className="space-y-1">
             {section.items.map((item) => (
-              <SidebarItem
-                key={item.label}
-                item={item}
-                animate={animate}
-                onItemClick={onItemClick}
+              <SidebarItem 
+                key={item.label} 
+                item={item} 
+                animate={animate} 
+                onItemClick={onItemClick} 
               />
             ))}
           </nav>
@@ -260,19 +252,19 @@ function SidebarItem({ item, animate, onItemClick }) {
           <div
             className={`sidebar-item flex items-center justify-between ${isActive ? "active" : ""}`}
           >
-            <div className="flex items-center gap-3">
+             <div className="flex items-center gap-3">
               <item.icon size={20} />
               <span className="font-medium">{item.label}</span>
             </div>
             {item.subItems && (
-              <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
-                <ChevronDown size={16} />
-              </div>
+               <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                 <ChevronDown size={16} />
+               </div>
             )}
           </div>
         )}
       </Link>
-
+      
       <AnimatePresence>
         {item.subItems && isExpanded && (
           <motion.div
@@ -287,8 +279,9 @@ function SidebarItem({ item, animate, onItemClick }) {
                 key={subItem.label}
                 to={subItem.path}
                 onClick={onItemClick}
-                className={`block py-2 px-2 text-sm rounded-lg hover:text-primary hover:bg-sidebar-accent/50 transition-colors ${location.pathname === subItem.path ? "text-primary bg-sidebar-accent/50 font-medium" : "text-muted-foreground"
-                  }`}
+                className={`block py-2 px-2 text-sm rounded-lg hover:text-primary hover:bg-sidebar-accent/50 transition-colors ${
+                  location.pathname === subItem.path ? "text-primary bg-sidebar-accent/50 font-medium" : "text-muted-foreground"
+                }`}
               >
                 {subItem.label}
               </Link>
