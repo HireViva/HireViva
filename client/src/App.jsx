@@ -31,7 +31,6 @@ import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
 import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
 import AptitudeTest from "./pages/AptitudeTest.jsx";
 import AptitudeResult from "./pages/AptitudeResult.jsx";
-import StudyMaterial from "./pages/StudyMaterial.jsx";
 
 const queryClient = new QueryClient();
 
