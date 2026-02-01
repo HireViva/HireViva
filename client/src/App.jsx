@@ -26,6 +26,10 @@ import MockTestDashboard from "./pages/test/MockTestDashboard.jsx";
 import StartTest from "./pages/test/StartTest.jsx";
 import Test from "./pages/test/Test.jsx";
 import Result from "./pages/test/Result.jsx";
+import AIInterviewLanding from "./pages/ai-interview/LandingPage.jsx";
+import InterviewSetup from "./pages/ai-interview/InterviewSetup.jsx";
+import InterviewRoom from "./pages/ai-interview/InterviewRoom.jsx";
+import InterviewResults from "./pages/ai-interview/InterviewResults.jsx";
 import AptitudeStudyMaterial from "./pages/AptitudeStudyMaterial.jsx";
 import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
 import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
@@ -66,6 +70,11 @@ const App = () => (
             <Route path="/mock-test/:testId/attempt" element={<ProtectedRoute><Test /></ProtectedRoute>} />
             <Route path="/mock-test/:testId/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
 
+            {/* AI Interview Routes */}
+            <Route path="/ai-interview" element={<AIInterviewLanding />} />
+            <Route path="/ai-interview/setup" element={<InterviewSetup />} />
+            <Route path="/ai-interview/room" element={<InterviewRoom />} />
+            <Route path="/ai-interview/results/:id" element={<InterviewResults />} />
             {/* Aptitude Routes - Protected */}
             <Route path="/aptitude-study-material" element={<ProtectedRoute><AptitudeStudyMaterial /></ProtectedRoute>} />
             <Route path="/aptitude-mock-test" element={<ProtectedRoute><AptitudeMockTestDashboard /></ProtectedRoute>} />

@@ -1,0 +1,342 @@
+/* AI Interview Global Styles - Override HireViva */
+
+/* AI Interview Container - Full screen overlay */
+.ai-interview-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  /* Reset HireViva styles */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  background: #04050B !important;
+  color: #f8fafc !important;
+
+  /* Define AI Interview CSS Variables */
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary: #ec4899;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg-dark: #0f172a;
+  --bg-darker: #020617;
+  --bg-card: rgba(30, 41, 59, 0.5);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.1);
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Reset all child elements */
+.ai-interview-container * {
+  box-sizing: border-box;
+}
+
+/* Glassmorphism utility */
+.ai-interview-container .glass {
+  background: var(--bg-card) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+}
+
+/* Button styles */
+.ai-interview-container .btn {
+  padding: 12px 32px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-family: 'Inter', sans-serif !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.ai-interview-container .btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4) !important;
+}
+
+.ai-interview-container .btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 30px rgba(99, 102, 241, 0.6) !important;
+}
+
+.ai-interview-container .btn-secondary {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.ai-interview-container .btn-secondary:hover {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border-color: var(--primary) !important;
+}
+
+.ai-interview-container .btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Input styles */
+.ai-interview-container .input-group {
+  margin-bottom: 24px !important;
+}
+
+.ai-interview-container .input-group label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+}
+
+.ai-interview-container select,
+.ai-interview-container input {
+  width: 100% !important;
+  padding: 14px 18px !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+  font-size: 16px !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: all 0.3s ease !important;
+}
+
+.ai-interview-container select:focus,
+.ai-interview-container input:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+.ai-interview-container select option {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Typography overrides */
+.ai-interview-container h1,
+.ai-interview-container h2,
+.ai-interview-container h3,
+.ai-interview-container h4,
+.ai-interview-container h5,
+.ai-interview-container h6 {
+  color: var(--text-primary) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.ai-interview-container p {
+  color: var(--text-secondary) !important;
+}
+
+/* Animations */
+@keyframes ai-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-interview-container .fade-in {
+  animation: ai-fadeIn 0.6s ease-out !important;
+}
+
+/* Scrollbar */
+.ai-interview-container::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.ai-interview-container::-webkit-scrollbar-track {
+  background: var(--bg-darker) !important;
+}
+
+.ai-interview-container::-webkit-scrollbar-thumb {
+  background: var(--primary) !important;
+  border-radius: 4px !important;
+}
+
+.ai-interview-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark) !important;
+}
+
+:root {
+  --ai-primary: #6366f1;
+  --ai-primary-dark: #4f46e5;
+  --ai-primary-light: #818cf8;
+  --ai-secondary: #ec4899;
+  --ai-success: #10b981;
+  --ai-warning: #f59e0b;
+  --ai-danger: #ef4444;
+  --ai-bg-dark: #0f172a;
+  --ai-bg-darker: #020617;
+  --ai-bg-card: rgba(30, 41, 59, 0.5);
+  --ai-text-primary: #f8fafc;
+  --ai-text-secondary: #cbd5e1;
+  --ai-text-muted: #94a3b8;
+  --ai-border: rgba(148, 163, 184, 0.1);
+  --ai-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* AI Interview Container - Override HireViva styles */
+.ai-interview-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #04050B;
+  color: var(--ai-text-primary);
+  min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+/* Glassmorphism utility */
+.ai-interview-container .glass {
+  background: var(--ai-bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--ai-border);
+  border-radius: 20px;
+}
+
+/* Button styles */
+.ai-interview-container .btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-interview-container .btn-primary {
+  background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.ai-interview-container .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(99, 102, 241, 0.6);
+}
+
+.ai-interview-container .btn-secondary {
+  background: var(--ai-bg-card);
+  color: var(--ai-text-primary);
+  border: 1px solid var(--ai-border);
+}
+
+.ai-interview-container .btn-secondary:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: var(--ai-primary);
+}
+
+.ai-interview-container .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Input styles */
+.ai-interview-container .input-group {
+  margin-bottom: 24px;
+}
+
+.ai-interview-container .input-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--ai-text-secondary);
+  font-size: 14px;
+}
+
+.ai-interview-container select,
+.ai-interview-container input {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--ai-border);
+  border-radius: 12px;
+  color: var(--ai-text-primary);
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.ai-interview-container select:focus,
+.ai-interview-container input:focus {
+  outline: none;
+  border-color: var(--ai-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.ai-interview-container select option {
+  background: var(--ai-bg-dark);
+  color: var(--ai-text-primary);
+}
+
+/* Animations */
+@keyframes ai-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-interview-container .fade-in {
+  animation: ai-fadeIn 0.6s ease-out;
+}
+
+/* Scrollbar */
+.ai-interview-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ai-interview-container::-webkit-scrollbar-track {
+  background: var(--ai-bg-darker);
+}
+
+.ai-interview-container::-webkit-scrollbar-thumb {
+  background: var(--ai-primary);
+  border-radius: 4px;
+}
+
+.ai-interview-container::-webkit-scrollbar-thumb:hover {
+  background: var(--ai-primary-dark);
+}

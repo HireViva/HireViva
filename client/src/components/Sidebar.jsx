@@ -27,7 +27,7 @@ const menuSections = [
   {
     title: "LEARNING & PRACTICE",
     items: [
-      { icon: Bot, label: "AI Interview", path: "#" },
+      { icon: Bot, label: "AI Interview", path: "/ai-interview" },
       { icon: FileText, label: "Coding Sheet", path: "/coding-sheet" },
       {
         icon: BookOpen,

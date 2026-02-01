@@ -1,0 +1,356 @@
+.interview-room {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+.status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    gap: 20px;
+    flex-wrap: wrap;
+    z-index: 50;
+}
+
+.status-left,
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.pulse-icon {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.role-badge {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+}
+
+.listening-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.listening-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.interview-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* New Video Grid Layout */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    width: 100%;
+    padding: 0 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/2;
+    background: var(--bg-card);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.video-card:hover {
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary);
+}
+
+.video-label {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+}
+
+.dot.ai {
+    background: var(--primary);
+}
+
+.mic-status-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-danger {
+    color: var(--danger);
+}
+
+.text-success {
+    color: var(--success);
+}
+
+/* Floating Status Badge */
+.status-badge.floating {
+    position: absolute;
+    top: -60px;
+    /* Position above videos */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 20;
+    white-space: nowrap;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--success);
+    color: var(--success);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+}
+
+.error-banner {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 12px;
+    color: var(--danger);
+    font-size: 14px;
+    text-align: center;
+    z-index: 100;
+}
+
+.thinking-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.thinking-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.thinking-dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--warning);
+    border-radius: 50%;
+    animation: bounce 1.4s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.thinking-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.thinking-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.speaking-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.speaking-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px;
+    z-index: 50;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border: 2px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.control-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.control-btn.muted {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.control-btn.muted:hover {
+    border-color: var(--danger);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+}
+
+.end-btn {
+    background: linear-gradient(135deg, var(--danger), #f87171);
+    color: white;
+    border-color: var(--danger);
+}
+
+.end-btn:hover {
+    border-color: var(--danger);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+}
+
+@media (max-width: 1024px) {
+    .video-grid {
+        gap: 20px;
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .video-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .status-badge.floating {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
+        margin-bottom: 20px;
+    }
+
+    .interview-room {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .status-bar {
+        padding: 12px 16px;
+    }
+
+    .control-bar {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .control-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
