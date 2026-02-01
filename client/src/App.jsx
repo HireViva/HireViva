@@ -21,6 +21,7 @@ import Pricing from "./pages/Pricing.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsAndConditions from "./pages/TermsAndConditions.jsx";
 import CancellationAndRefundPolicy from "./pages/CancellationAndRefundPolicy.jsx";
+import StudyMaterial from "./pages/StudyMaterial.jsx";
 import MockTestDashboard from "./pages/test/MockTestDashboard.jsx";
 import StartTest from "./pages/test/StartTest.jsx";
 import Test from "./pages/test/Test.jsx";
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
             <Route path="/cancellation-and-refund-policy" element={<CancellationAndRefundPolicy />} />
+            <Route path="/study-material" element={<StudyMaterial />} />
 
             {/* Core Subject Routes - Protected */}
             <Route path="/study-material" element={<ProtectedRoute><StudyMaterial /></ProtectedRoute>} />

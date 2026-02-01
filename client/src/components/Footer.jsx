@@ -134,7 +134,7 @@ export default function Footer() {
           className="mt-6 pt-6 border-t border-border/30 text-center"
         >
           <p className="text-muted-foreground text-sm">
-            © 2025 HireViva. All rights reserved.
+            © 2026 HireViva. All rights reserved.
           </p>
         </motion.div>
       </motion.div>

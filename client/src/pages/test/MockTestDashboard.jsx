@@ -103,6 +103,44 @@ export default function MockTestDashboard() {
                                     </Link>
                                 </motion.div>
                             ))}
+                            {Array(Math.max(0, 9 - tests.length)).fill(0).map((_, index) => (
+                                <motion.div
+                                    key={`placeholder-test-${index}`}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    whileHover={{ y: -5 }}
+                                    transition={{ delay: (tests.length + index) * 0.1 }}
+                                >
+                                    <div className="h-full p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 shadow-lg hover:shadow-primary/10 group cursor-pointer">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                                <BookOpen size={24} />
+                                            </div>
+                                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                                Coming Soon
+                                            </span>
+                                        </div>
+
+                                        <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                                            Mock Test {tests.length + index + 1}
+                                        </h3>
+                                        <p className="text-muted-foreground text-sm mb-6">
+                                            This mock test will be available soon. Stay tuned!
+                                        </p>
+
+                                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                                            <div className="flex items-center gap-1.5">
+                                                <Clock size={16} />
+                                                <span>~30 mins</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center text-primary font-medium text-sm group-hover:translate-x-1 transition-transform">
+                                            Start Test <ArrowRight size={16} className="ml-1" />
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
                         </div>
                     )}
                 </div>
