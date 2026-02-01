@@ -7,6 +7,7 @@ import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import progressRouter from './routes/progressRoutes.js';
 import quizRouter from './routes/quizRoutes.js';
+import aptitudeQuizRouter from './routes/aptitudeQuizRoutes.js';
 
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/progress', progressRouter);
 app.use('/api/quiz', quizRouter);
+app.use('/api/aptitude-quiz', aptitudeQuizRouter);
 
 
 app.listen(PORT, () => {
