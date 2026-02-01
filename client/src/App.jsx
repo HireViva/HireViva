@@ -14,6 +14,12 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import EmailVerify from "./pages/EmailVerify.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
+import Contact from "./pages/Contact.jsx";
+import Pricing from "./pages/Pricing.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import TermsAndConditions from "./pages/TermsAndConditions.jsx";
+import CancellationAndRefundPolicy from "./pages/CancellationAndRefundPolicy.jsx";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +38,12 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/coding-sheet" element={<CodingSheet />} />
             <Route path="/communication" element={<Communication />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/cancellation-and-refund-policy" element={<CancellationAndRefundPolicy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

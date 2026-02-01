@@ -3,22 +3,22 @@ import { X, Check, Zap, Crown, Rocket } from "lucide-react";
 
 const plans = [
   {
-    name: "Basic",
-    price: "₹99",
+    name: "Free",
+    price: "₹0",
     period: "/month",
     icon: Zap,
     features: [
-      "Access to all notes",
-      "MAKAUT PYQs",
-      "Basic study materials",
-      "Email support",
+      "Access to basic features",
+      "Limited interview practice",
+      "Everythhing in Basic",
+      "AI-powered coding sheets",
     ],
     color: "from-cyan-accent to-cyan-accent/70",
     popular: false,
   },
   {
-    name: "Pro",
-    price: "₹199",
+    name: "Basic",
+    price: "₹99",
     period: "/month",
     icon: Crown,
     features: [
@@ -32,8 +32,8 @@ const plans = [
     popular: true,
   },
   {
-    name: "Pro Max",
-    price: "₹349",
+    name: "Pro",
+    price: "₹199",
     period: "/month",
     icon: Rocket,
     features: [
@@ -41,8 +41,7 @@ const plans = [
       "1-on-1 mentorship",
       "Interview preparation",
       "Resume review",
-      "Job referrals",
-      "Lifetime updates",
+      "Extended updates",
     ],
     color: "from-green-accent to-emerald-500",
     popular: false,
