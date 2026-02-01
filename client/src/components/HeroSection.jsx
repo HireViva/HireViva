@@ -221,9 +221,7 @@ export default function HeroSection() {
             variants={fadeUpVariants}
             className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
           >
-            HireViva is a dedicated platform that helps engineering students
-            excel in exams with Free resources, Concise Notes, MAKAUT PYQs, and smart
-            topic-focused Suggestions. We make Preparation Easier and more Effective.
+           A complete learning ecosystem for engineering students — combining AI interviews, coding practice, core subjects, aptitude, communication skills, progress tracking, and expert guidance to help you learn smarter and succeed faster.
           </motion.p>
 
           <motion.div
