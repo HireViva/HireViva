@@ -17,10 +17,16 @@ const PORT = process.env.PORT || 3000;
 
 connectDB();
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:8080",
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:8080"],
+    origin: allowedOrigins,
     credentials: true
 }));
 

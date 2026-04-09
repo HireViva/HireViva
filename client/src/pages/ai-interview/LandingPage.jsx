@@ -42,7 +42,7 @@ const LandingPage = () => {
         formData.append('resume', file);
 
         try {
-            const response = await fetch('http://localhost:3000/api/resume/upload', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/resume/upload`, {
                 method: 'POST',
                 body: formData,
             });
