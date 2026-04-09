@@ -3,21 +3,27 @@
 
 import Groq from 'groq-sdk';
 
+const apiKey = process.env.GROQ_API_KEY;
+
+if (!apiKey) {
+    console.error('\x1b[31m[GROQ] ERROR: GROQ_API_KEY is missing in .env file!\x1b[0m');
+} else {
+    console.log('[GROQ] ✅ API key loaded (starts with:', apiKey.substring(0, 8) + '...)');
+}
+
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
+    apiKey: apiKey || 'missing-key',
 });
 
 // Generate system prompt based on interview configuration
 const generateSystemPrompt = (role, difficulty, duration, resumeText = null) => {
     const inputSignal = resumeText
         ? `PARSED RESUME CONTENT:\n${resumeText}\n\nUser provided a resume.`
-        : `INPUT SIGNAL:\nNo resume was provided.Switching to NO-RESUME INTERVIEW MODE.`;
+        : `INPUT SIGNAL:\nNo resume was provided. Switching to NO-RESUME INTERVIEW MODE.`;
 
-    return `You are a professional AI technical interviewer conducting a real software engineering interview.
+    return `You are a professional AI technical interviewer conducting a real software engineering interview for a ${role} position at a tech company.
 
-You do NOT chat.
-You do NOT teach.
-You strictly evaluate candidates as in a real hiring interview.
+You strictly evaluate candidates exactly as a Senior Hiring Manager would in a real-world interview.
 
 You will receive one of two inputs:
 1) Parsed resume content
@@ -29,44 +35,41 @@ You must behave according to the rules below.
 GLOBAL INTERVIEW RULES (STRICT)
 ====================================================
 - Maintain a formal, neutral, professional tone.
-- Ask only ONE question at a time.
-- Do not praise, encourage, or motivate the candidate.
-- Do not joke or use casual language.
-- Do not explain concepts or reveal answers.
-- Do not exceed the allocated time for any section.
-- Do not allow one skill to consume excessive interview time.
-- If an answer is weak or incorrect, ask at most ONE probing follow-up.
-- If still weak, move on immediately.
+- Ask only ONE question at a time. Do not stack questions.
+- Listen to the candidate's answer before proceeding.
+- Do not praise excessively ("Great answer!"), but use professional acknowledgments ("Understood", "Makes sense", "Let's move on to...").
+- Do not explain concepts or reveal the right answers. If they don't know it, move on.
 - You must manage interview time efficiently.
+
+====================================================
+INTERVIEW FLOW (CRITICAL SEQUENCE)
+====================================================
+You MUST follow this exact sequence during the interview:
+
+1) **Phase 1: Introduction (Brief)**
+   - Start by asking the candidate to introduce themselves and highlight their background.
+   
+2) **Phase 2: Projects & Experience (Deep Dive)**
+   - Ask about specific projects they worked on.
+   - Ask "Why" and "How": "Why did you choose that architecture?", "What was the biggest technical challenge you faced while building X?", "How did you measure the performance?"
+   
+3) **Phase 3: Core Technical Q&A (Domain specific)**
+   - Transition to hard technical questions based on the ${role} role and ${difficulty} difficulty level.
+   - Ask about core CS fundamentals, framework-specific lifecycle, system design, or problem-solving scenarios.
+   
+4) **Phase 4: Wrap-up**
+   - End the interview professionally when the allocated time is up.
 
 ====================================================
 RESUME-BASED INTERVIEW MODE
 (If resume content is provided)
 ====================================================
 
-You will receive:
-- Parsed resume text
-- Extracted skills, projects, experience, and technologies
-- Total interview duration
-
 Your task:
-1) **STRICT ADHERENCE**: You must base ALL questions on the resume content provided below.
-2) **Topic Coverage**:
-   - Start with their most recent Project or Work Experience.
-   - Drill down into the specific technologies *they* claimed (e.g., if they listed "React", ask about React hooks/lifecycle, not generic JS).
-   - Validate their specific claims (e.g., "You mentioned optimizing X by 50%... how exactly did you measure that?").
-
-3) **structure**:
-   - First 1/3: Experience & Projects (Deep dive).
-   - Second 1/3: Technical Skills/Stack validation (Code questions).
-   - Final 1/3: System Design or Architecture (related to their background).
-
-4) **ANTI-DRIFT RULE**: 
-   - Do NOT switch to generic/predefined questions unless the resume is empty or you have completely exhausted every single resume point.
-   - If they run out of resume topics, explicitly bridge: "Moving on from your resume, let's discuss..."
-
-5) **Difficulty**:
-   - Adjust based on their claims. If they claim "Expert" in Python, ask Expert-level Python questions immediately.
+1) **STRICT ADHERENCE**: Base your Phase 2 (Projects & Experience) strictly on the resume content provided below.
+2) **Targeting**: Drill down into the specific technologies *they* claimed. If they listed "Node.js", ask about the event loop or specific Node.js bottlenecks they faced in their listed project.
+3) **ANTI-DRIFT RULE**: Do NOT switch to generic predefined questions until you have explored their actual resume claims.
+4) **Difficulty**: Adjust based on their claims. If they claim "Expert" in a tech, grill them at an expert level.
 
 ====================================================
 NO-RESUME INTERVIEW MODE
@@ -74,32 +77,19 @@ NO-RESUME INTERVIEW MODE
 ====================================================
 
 If resume is NOT provided:
-- Switch immediately to role-based interview mode.
-
-Role-based mode rules:
-1) Use the selected role, difficulty, and total time.
-2) Divide time evenly across:
-   - Problem solving
-   - Core CS fundamentals
-   - Applied programming concepts
-3) Follow the same strict timing and probing rules.
-4) Do not assume prior experience.
+- During Phase 2, ask them to describe their most recent or most complex technical project from memory.
+- Base your follow-up questions on what they tell you in that description.
+- Divide the remaining time evenly across Problem Solving and Core CS fundamentals related to the ${role}.
 
 ====================================================
 ANSWER EVALUATION RULES
 ====================================================
 
 After each answer:
-- Evaluate internally on:
-  - Technical correctness
-  - Conceptual clarity
-  - Depth of understanding
-
-Decision logic:
-- If incorrect → ask ONE probing question.
-- If probing also fails → move on.
-- If partially correct → probe deeper once.
-- If strong → increase difficulty gradually.
+- Evaluate internally on: Technical correctness, Conceptual clarity, Depth of understanding.
+- If incorrect → ask ONE probing question to see if they can correct themselves.
+- If probing also fails → move on gracefully.
+- If strong → increase the technical depth on the next question.
 
 ====================================================
 TIME MANAGEMENT (CRITICAL)
@@ -116,23 +106,31 @@ Duration: ${duration} minutes
 const startInterview = async (role, difficulty, duration, resumeText = null) => {
     const systemPrompt = generateSystemPrompt(role, difficulty, duration, resumeText);
 
-    const chatCompletion = await groq.chat.completions.create({
-        messages: [
-            {
-                role: 'system',
-                content: systemPrompt
-            },
-            {
-                role: 'user',
-                content: 'Start the interview immediately. Introduce yourself briefly as a Senior Software Engineer and ask the first technical question. Do not engage in small talk.'
-            }
-        ],
-        model: 'llama-3.3-70b-versatile', // Fast and capable model
-        temperature: 0.7,
-        max_tokens: 500,
-    });
+    try {
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'system',
+                    content: systemPrompt
+                },
+                {
+                    role: 'user',
+                    content: `Start the interview. Introduce yourself briefly as Alex, a Senior Software Engineer. Welcome the candidate and ask them to briefly introduce themselves and give an overview of their recent experience.`
+                }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.7,
+            max_tokens: 500,
+        });
 
-    return chatCompletion.choices[0]?.message?.content || 'Hello! I\'m Alex, your AI interviewer. Let\'s begin!';
+        return chatCompletion.choices[0]?.message?.content || 'Hello! I\'m Alex, a Senior Software Engineer. Let\'s begin by having you introduce yourself.';
+    } catch (error) {
+        console.error('[GROQ] startInterview error:', error.message, error.status);
+        if (error.status === 401) {
+            throw new Error('Groq API key is invalid or expired. Please update GROQ_API_KEY in .env');
+        }
+        throw error;
+    }
 };
 
 // Get AI response to user message
@@ -145,14 +143,22 @@ const getResponse = async (conversationHistory, systemPrompt) => {
         ...conversationHistory
     ];
 
-    const chatCompletion = await groq.chat.completions.create({
-        messages,
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
-        max_tokens: 500,
-    });
+    try {
+        const chatCompletion = await groq.chat.completions.create({
+            messages,
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.7,
+            max_tokens: 500,
+        });
 
-    return chatCompletion.choices[0]?.message?.content || 'I see. Please continue.';
+        return chatCompletion.choices[0]?.message?.content || 'I see. Please continue.';
+    } catch (error) {
+        console.error('[GROQ] getResponse error:', error.message, error.status);
+        if (error.status === 401) {
+            throw new Error('Groq API key is invalid or expired. Please update GROQ_API_KEY in .env');
+        }
+        throw error;
+    }
 };
 
 // Generate final feedback and scores
@@ -188,48 +194,45 @@ const generateFeedback = async (conversation, role, difficulty) => {
       "feedback": "A brutally honest paragraph summary. Do not use 'sandwich method' (good-bad-good). Start directly with the main critique."
     }`;
 
-    const chatCompletion = await groq.chat.completions.create({
-        messages: [
-            {
-                role: 'user',
-                content: feedbackPrompt
-            }
-        ],
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.3, // Lower temperature for more consistent JSON
-        max_tokens: 1500,
-        response_format: { type: 'json_object' } // Ensure JSON response
-    });
-
-    const responseText = chatCompletion.choices[0]?.message?.content;
-
-    // Clean up potential markdown formatting (```json ... ```)
-    const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-
     try {
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'user',
+                    content: feedbackPrompt
+                }
+            ],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 1500,
+            response_format: { type: 'json_object' }
+        });
+
+        const responseText = chatCompletion.choices[0]?.message?.content;
+        const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
         return JSON.parse(cleanJson);
     } catch (error) {
-        console.error('Error parsing feedback JSON:', error);
-        // Return default scores if parsing fails
+        console.error('[GROQ] generateFeedback error:', error.message);
         return {
-            overall: 75,
+            overall: 50,
             scores: {
-                technical: 75,
-                communication: 75,
-                problemSolving: 75,
-                confidence: 75
+                technical: 50,
+                communication: 50,
+                problemSolving: 50,
+                confidence: 50
             },
             strengths: [
                 'Participated in the interview',
-                'Communicated clearly',
-                'Showed engagement'
+                'Attempted to answer questions',
+                'Showed willingness to engage'
             ],
             improvements: [
-                'Provide more detailed answers',
-                'Give specific examples',
-                'Ask clarifying questions'
+                'Provide more detailed technical answers',
+                'Give specific examples from past experience',
+                'Demonstrate deeper understanding of core concepts'
             ],
-            feedback: 'Thank you for participating in this interview. Continue practicing to improve your skills.'
+            feedback: 'Unable to generate detailed AI feedback at this time. Please review your interview recording for self-assessment.'
         };
     }
 };

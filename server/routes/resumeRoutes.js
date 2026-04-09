@@ -2,31 +2,22 @@ import express from 'express';
 const router = express.Router();
 import multer from 'multer';
 
-// --- ULTIMATE DEFENSIVE IMPORT ---
-// This block prevents the server from crashing regardless of what pdf-parse version 
-// is installed (or if it's missing/broken).
-let pdfParser = null;
-(async () => {
-    try {
-        // Try to load the library
-        const pdfLib = await import('pdf-parse');
-
-        // Check what we got
-        if (typeof pdfLib === 'function') {
-            // v1.1.1 (Standard)
-            pdfParser = pdfLib;
-        } else if (pdfLib && typeof pdfLib.default === 'function') {
-            // v2.4.5+ (ES Module / TypeScript default export)
-            pdfParser = pdfLib.default;
-        } else {
-            console.warn('PDF Parser loaded but format is unrecognized (not a function).');
-        }
-    } catch (err) {
-        // If import throws (e.g. "MODULE_NOT_FOUND")
-        console.warn('PDF Parser could not be loaded (Server will continue without it):', err.message);
+// --- PDF Parser Import for pdf-parse v2.4.5 ---
+// v2.4.5 exports a PDFParse class (not a function).
+// Usage: new PDFParse({ data: buffer }); await parser.getText();
+let PDFParseClass = null;
+try {
+    const pdfLib = await import('pdf-parse');
+    if (pdfLib.PDFParse && typeof pdfLib.PDFParse === 'function') {
+        PDFParseClass = pdfLib.PDFParse;
+        console.log('[PDF] ✅ PDF Parser loaded successfully (v2.4.5 class-based API)');
+    } else {
+        console.warn('[PDF] ⚠️ pdf-parse loaded but PDFParse class not found. Keys:', Object.keys(pdfLib));
     }
-})();
-// ---------------------------------
+} catch (err) {
+    console.warn('[PDF] ⚠️ pdf-parse could not be loaded:', err.message);
+}
+// -----------------------------------------------
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -39,28 +30,34 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
 
         let extractedText = "";
 
-        if (pdfParser) {
-            console.log('Parsing PDF with loaded library...');
+        if (PDFParseClass) {
+            console.log('[PDF] Parsing uploaded PDF...');
             try {
-                const data = await pdfParser(req.file.buffer);
-                extractedText = data.text;
+                // pdf-parse v2.4.5 API: pass data as Uint8Array in constructor options
+                const parser = new PDFParseClass({ data: new Uint8Array(req.file.buffer) });
+                const result = await parser.getText();
+
+                // result is a TextResult object, extract the text content
+                extractedText = typeof result === 'string' ? result : (result?.text || String(result));
 
                 if (!extractedText || !extractedText.trim()) {
-                    extractedText = "Resume uploaded but text appears empty.";
+                    extractedText = "Resume uploaded but text appears empty (possibly a scanned/image PDF).";
+                } else {
+                    console.log('[PDF] ✅ Extracted', extractedText.length, 'characters from PDF');
                 }
             } catch (parseErr) {
-                console.error('PDF Analysis Failed:', parseErr);
-                extractedText = "Resume uploaded (Analysis failed: " + parseErr.message + ")";
+                console.error('[PDF] ❌ PDF parsing failed:', parseErr.message);
+                extractedText = "Resume uploaded (PDF text extraction failed: " + parseErr.message + ")";
             }
         } else {
-            console.log('PDF Parser unavailable. Skipping text extraction.');
-            extractedText = "Resume uploaded successfully (Text analysis unavailable).";
+            console.log('[PDF] Parser unavailable. Skipping text extraction.');
+            extractedText = "Resume uploaded successfully (Text analysis unavailable - pdf-parse not loaded).";
         }
 
         res.json({ success: true, text: extractedText });
 
     } catch (error) {
-        console.error('Upload Endpoint Error:', error);
+        console.error('[PDF] Upload Endpoint Error:', error);
         res.status(500).json({ error: 'Upload failed: ' + error.message });
     }
 });
