@@ -57,6 +57,18 @@ const Cloud = ({ className, delay, duration, startX, endX }) => (
 );
 
 // Butterfly component with wing flapping animation
+const leftWingPaths = [
+  "M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20",
+  "M25 20 C18 15, 10 18, 12 24 C14 28, 21 26, 25 20",
+  "M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20",
+];
+
+const rightWingPaths = [
+  "M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20",
+  "M25 20 C32 15, 40 18, 38 24 C36 28, 29 26, 25 20",
+  "M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20",
+];
+
 const Butterfly = () => {
   return (
     <motion.div
@@ -92,15 +104,10 @@ const Butterfly = () => {
       >
         {/* Left wing */}
         <motion.path
-          d="M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20"
+          d={leftWingPaths[0]}
           fill="url(#wingGradient1)"
-          animate={{
-            d: [
-              "M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20",
-              "M25 20 C18 15, 10 18, 12 24 C14 28, 21 26, 25 20",
-              "M25 20 C15 10, 5 15, 8 25 C10 30, 20 28, 25 20",
-            ]
-          }}
+          style={{ transformOrigin: "25px 20px" }}
+          animate={{ rotate: [0, -18, 0] }}
           transition={{
             duration: 0.3,
             repeat: Infinity,
@@ -109,15 +116,10 @@ const Butterfly = () => {
         />
         {/* Right wing */}
         <motion.path
-          d="M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20"
+          d={rightWingPaths[0]}
           fill="url(#wingGradient2)"
-          animate={{
-            d: [
-              "M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20",
-              "M25 20 C32 15, 40 18, 38 24 C36 28, 29 26, 25 20",
-              "M25 20 C35 10, 45 15, 42 25 C40 30, 30 28, 25 20",
-            ]
-          }}
+          style={{ transformOrigin: "25px 20px" }}
+          animate={{ rotate: [0, 18, 0] }}
           transition={{
             duration: 0.3,
             repeat: Infinity,
@@ -221,7 +223,7 @@ export default function HeroSection() {
             variants={fadeUpVariants}
             className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
           >
-           A complete learning ecosystem for engineering students — combining AI interviews, coding practice, core subjects, aptitude, communication skills, progress tracking, and expert guidance to help you learn smarter and succeed faster.
+            A complete learning ecosystem for engineering students — combining AI interviews, coding practice, core subjects, aptitude, communication skills, progress tracking, and expert guidance to help you learn smarter and succeed faster.
           </motion.p>
 
           <motion.div

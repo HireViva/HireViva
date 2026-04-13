@@ -4,12 +4,17 @@ import { Upload, FileText, AlertCircle, CheckCircle, ArrowRight, ArrowLeft } fro
 import AIInterviewLayout from './AIInterviewLayout';
 import './LandingPage.css';
 
+import UpgradePrompt from '../../components/UpgradePrompt';
+import { useSubscription } from '../../hooks/useSubscription';
+
 const LandingPage = () => {
     const navigate = useNavigate();
     const [file, setFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState('');
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+    const { subscription, canAccessAIInterview } = useSubscription();
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -33,6 +38,11 @@ const LandingPage = () => {
     };
 
     const handleUpload = async () => {
+        if (!canAccessAIInterview()) {
+            setShowUpgradePrompt(true);
+            return;
+        }
+
         if (!file) return;
 
         setIsUploading(true);
@@ -42,7 +52,7 @@ const LandingPage = () => {
         formData.append('resume', file);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/resume/upload`, {
+            const response = await fetch('http://localhost:5000/api/resume/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -68,12 +78,24 @@ const LandingPage = () => {
     };
 
     const handleSkip = () => {
+        if (!canAccessAIInterview()) {
+            setShowUpgradePrompt(true);
+            return;
+        }
         navigate('/ai-interview/setup');
     };
 
     return (
         <AIInterviewLayout>
             <div className="landing-page fade-in">
+                {showUpgradePrompt && (
+                    <UpgradePrompt
+                        currentTier={subscription?.tier || 'free'}
+                        requiredTier="pro"
+                        feature="AI Interviews"
+                        onClose={() => setShowUpgradePrompt(false)}
+                    />
+                )}
                 <div className="landing-container">
                     {/* Back Button */}
                     <button

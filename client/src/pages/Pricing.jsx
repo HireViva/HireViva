@@ -2,48 +2,73 @@ import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { Check, Zap, Crown, Rocket } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+const loadRazorpay = () => {
+    return new Promise((resolve) => {
+        if (window.Razorpay) {
+            resolve(true);
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
 
 const plans = [
     {
+        id: "free",
         name: "Free",
         price: "₹0",
         period: "/month",
         icon: Zap,
         features: [
-            "Access to basic features",
-            "Limited interview practice",
-            "Everything in Basic",
-            "AI-powered coding sheets",
+            "2 Mock Tests (Very Limited)",
+            "1 AI Interview (Very Limited)",
+            "Basic Analytics",
+            "Community Support",
         ],
         color: "from-cyan-accent to-cyan-accent/70",
         popular: false,
     },
     {
+        id: "basic",
         name: "Basic",
-        price: "₹99",
+        price: "₹299",
         period: "/month",
         icon: Crown,
         features: [
-            "Everything in Basic",
-            "AI-powered practice tests",
-            "Video explanations",
-            "Priority support",
-            "Offline access",
+            "6 Mock Tests (Limited Access)",
+            "5 AI Interviews (Limited Access)",
+            "Detailed Analytics",
+            "Performance Tracking",
+            "Email Support",
+            "Progress Reports",
         ],
         color: "from-purple-glow to-purple-accent",
         popular: true,
     },
     {
+        id: "pro",
         name: "Pro",
-        price: "₹199",
+        price: "₹599",
         period: "/month",
         icon: Rocket,
         features: [
-            "Everything in Pro",
-            "1-on-1 mentorship",
-            "Interview preparation",
-            "Resume review",
-            "Extended updates",
+            "Unlimited Mock Tests (Full Access)",
+            "Unlimited AI Interviews (Full Access)",
+            "Advanced Analytics",
+            "Priority Support",
+            "Resume Analysis",
+            "All Premium Features",
         ],
         color: "from-green-accent to-emerald-500",
         popular: false,
@@ -73,6 +98,109 @@ const cardVariants = {
 };
 
 export default function Pricing() {
+    const navigate = useNavigate();
+    const [subscription, setSubscription] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [processingPlan, setProcessingPlan] = useState(null);
+
+    useEffect(() => {
+        fetchSubscriptionStatus();
+    }, []);
+
+    const fetchSubscriptionStatus = async () => {
+        try {
+            const response = await api.get('/subscription/status');
+
+            if (response.data) {
+                setSubscription(response.data.subscription);
+            }
+        } catch (error) {
+            console.error('Failed to fetch subscription:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubscribe = async (plan) => {
+        if (plan.id === 'free') return;
+
+        setProcessingPlan(plan.id);
+
+        try {
+            const scriptLoaded = await loadRazorpay();
+            if (!scriptLoaded) {
+                alert('Failed to load payment gateway. Please try again.');
+                setProcessingPlan(null);
+                return;
+            }
+
+            const orderResponse = await api.post('/payment/createorder', {
+                subscriptionType: plan.id
+            });
+
+            if (!orderResponse.data.success) throw new Error('Failed to create order');
+            const orderData = orderResponse.data;
+
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: orderData.order.amount,
+                currency: orderData.order.currency,
+                name: 'HireViva',
+                description: `${plan.name} Subscription`,
+                order_id: orderData.order.id,
+                handler: async (response) => {
+                    try {
+                        const verifyResponse = await api.post('/payment/verifypayment', {
+                            order_id: response.razorpay_order_id,
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature,
+                            subscriptionType: plan.id
+                        });
+
+                        if (verifyResponse.data.success) {
+                            alert('Subscription activated successfully!');
+                            fetchSubscriptionStatus();
+                            navigate('/dashboard');
+                        } else {
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    } catch (error) {
+                        alert('Payment verification failed. Please contact support.');
+                    }
+                },
+                theme: { color: '#6366f1' },
+                modal: {
+                    ondismiss: () => setProcessingPlan(null)
+                }
+            };
+
+            const razorpay = new window.Razorpay(options);
+            razorpay.on('payment.failed', () => {
+                alert('Payment failed. Please try again.');
+                setProcessingPlan(null);
+            });
+            razorpay.open();
+        } catch (error) {
+            console.error('Payment error:', error);
+            if (error.response?.status === 401) {
+                navigate('/login');
+            } else {
+                alert('Failed to process payment. Please try again.');
+            }
+            setProcessingPlan(null);
+        }
+    };
+
+    const getButtonText = (plan) => {
+        if (processingPlan === plan.id) return 'Processing...';
+        if (subscription?.tier === plan.id) return 'Current Plan';
+        if (plan.id === 'free') return 'Free Forever';
+        return 'Get Started';
+    };
+
+    const isButtonDisabled = (plan) => {
+        return processingPlan === plan.id || subscription?.tier === plan.id || plan.id === 'free';
+    };
     return (
         <div className="min-h-screen bg-background flex w-full">
             <Sidebar />
@@ -198,12 +326,14 @@ export default function Pricing() {
                                         <motion.button
                                             whileHover={{ scale: 1.03 }}
                                             whileTap={{ scale: 0.97 }}
+                                            onClick={() => handleSubscribe(plan)}
+                                            disabled={isButtonDisabled(plan)}
                                             className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${plan.popular
                                                 ? "btn-primary-gradient shadow-purple-glow/25"
                                                 : "bg-muted hover:bg-muted/80 border border-border/50 text-foreground"
-                                                }`}
+                                                } ${isButtonDisabled(plan) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
-                                            Get Started
+                                            {getButtonText(plan)}
                                         </motion.button>
                                     </motion.div>
                                 );
