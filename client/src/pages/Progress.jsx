@@ -109,37 +109,45 @@ export default function Progress() {
   }, [dashboardData]);
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
+    <div className="h-screen bg-background flex w-full overflow-hidden">
       <Sidebar />
-      <main className="relative flex-1 overflow-auto p-4 sm:p-6 lg:ml-64 lg:p-8">
+      <main className="relative flex-1 flex flex-col overflow-hidden lg:ml-64">
         <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--secondary)/0.14),transparent_34%),linear-gradient(135deg,hsl(var(--primary)/0.06),transparent_42%)]" />
 
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <header className="mb-8">
+        {/* Sticky Header — always visible, content scrolls beneath */}
+        <header className="shrink-0 z-20 border-b border-border/40 bg-background/80 backdrop-blur-md px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
             <motion.p
-              initial={{ opacity: 0, y: -12 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary"
+              className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary"
             >
               Performance Analytics
             </motion.p>
-            <motion.h1
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="text-4xl font-bold text-foreground md:text-5xl"
-            >
-              Progress Dashboard
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mt-3 max-w-3xl text-base text-muted-foreground"
-            >
-              Track interview practice, coding momentum, core subject readiness, and aptitude accuracy in one place.
-            </motion.p>
-          </header>
+            <div className="flex flex-col gap-0.5 sm:flex-row sm:items-end sm:justify-between">
+              <motion.h1
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="text-3xl font-bold text-foreground md:text-4xl"
+              >
+                Progress Dashboard
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="max-w-md text-sm text-muted-foreground sm:text-right"
+              >
+                Track interview practice, coding momentum, core subject readiness, and aptitude accuracy in one place.
+              </motion.p>
+            </div>
+          </div>
+        </header>
+
+        {/* Scrollable Content */}
+        <div className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto max-w-7xl">
 
           {loading ? (
             <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-border/50 bg-card/50">
@@ -246,6 +254,7 @@ export default function Progress() {
               </div>
             </div>
           )}
+        </div>
         </div>
       </main>
     </div>
