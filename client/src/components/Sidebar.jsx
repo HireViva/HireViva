@@ -43,10 +43,9 @@ const menuSections = [
     ],
   },
   {
-    title: "PERFORMANCE & CONNECT",
+    title: "PERFORMANCE",
     items: [
       { icon: TrendingUp, label: "Progress", path: "#" },
-      { icon: Users, label: "ExpertTalk", path: "#" },
     ],
   },
 ];

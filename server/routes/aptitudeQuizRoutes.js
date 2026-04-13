@@ -9,9 +9,9 @@ import {
     getUserQuizStats,
     getUserTestAttempts,
     getAttemptDetails
-} from '../controllers/quizController.js';
+} from '../controllers/aptitudeQuizController.js';
 import { checkMockTestAccess, incrementMockTestUsage } from '../middleware/subscriptionMiddleware.js';
-import Question from '../models/Question.js'; // Keep for tests list
+import AptitudeQuestion from '../models/AptitudeQuestion.js'; // Keep for tests list
 
 const router = express.Router();
 
@@ -31,11 +31,11 @@ router.get("/attempt/:attemptId/details", userAuth, getAttemptDetails);
 // Keep the route to list available tests for the dashboard
 router.get('/tests', userAuth, async (req, res) => {
     try {
-        const testSets = await Question.distinct('testSet');
+        const testSets = await AptitudeQuestion.distinct('testSet');
         const tests = testSets.map(set => ({
             id: set,
-            title: `Mock Test ${set}`,
-            description: `Comprehensive assessment for Mock Test ${set}`
+            title: `Aptitude Mock Test ${set}`,
+            description: `Comprehensive aptitude assessment for Mock Test ${set}`
         }));
         res.json({ success: true, tests });
     } catch (error) {

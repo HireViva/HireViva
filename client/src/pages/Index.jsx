@@ -1,7 +1,8 @@
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import ExpertSection from "@/components/ExpertSection";
+import Testimonials from "@/components/Testimonials";
+import TrustedCompanies from "@/components/TrustedCompanies";
 import Footer from "@/components/Footer";
 
 export default function Index() {
@@ -23,7 +24,8 @@ export default function Index() {
         <div className="relative max-w-6xl mx-auto pt-12 lg:pt-0">
           <Header />
           <HeroSection />
-          <ExpertSection />
+          <Testimonials />
+          <TrustedCompanies />
           <Footer />
         </div>
       </main>

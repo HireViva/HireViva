@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Pricing Page</title>
+</head>
+
+<body>
+    <h1>Testing Pricing Page</h1>
+    <p>Open the browser console and navigate to: <a href="http://localhost:5173/pricing"
+            target="_blank">http://localhost:5173/pricing</a></p>
+
+    <h2>Things to check:</h2>
+    <ol>
+        <li>Do you see any console errors when the page loads?</li>
+        <li>Click on "Get Started" for Basic or Pro plan</li>
+        <li>Does it show "Processing..." or any error?</li>
+        <li>Check Network tab for failed API calls</li>
+    </ol>
+
+    <h2>Common Issues:</h2>
+    <ul>
+        <li><strong>Button not clickable:</strong> Check if button is disabled (should only be disabled for Free plan or
+            current plan)</li>
+        <li><strong>No response on click:</strong> Check console for JavaScript errors</li>
+        <li><strong>Razorpay not loading:</strong> Check if Razorpay script loads in Network tab</li>
+    </ul>
+
+    <script>
+        console.log('Test page loaded');
+        console.log('Frontend URL:', 'http://localhost:5173');
+        console.log('Backend URL:', 'http://localhost:5000');
+        console.log('Razorpay Key:', 'Should be in .env as VITE_RAZORPAY_KEY_ID');
+    </script>
+</body>
+
+</html>

@@ -2,13 +2,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Trophy, Home, RotateCcw } from "lucide-react";
 
-export default function Result() {
+export default function AptitudeResult() {
     const { state } = useLocation();
     const navigate = useNavigate();
 
     // Redirect if accessed directly
     if (!state) {
-        navigate("/mock-test");
+        navigate("/aptitude-mock-test");
         return null;
     }
 
@@ -22,7 +22,7 @@ export default function Result() {
                     animate={{ scale: 1, opacity: 1 }}
                     className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden text-center"
                 >
-                    <div className="bg-indigo-600 p-10 text-white relative overflow-hidden">
+                    <div className="bg-purple-600 p-10 text-white relative overflow-hidden">
                         <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -30,8 +30,8 @@ export default function Result() {
                             className="relative z-10"
                         >
                             <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-300 drop-shadow-md" />
-                            <h1 className="text-3xl font-bold">Quiz Completed!</h1>
-                            <p className="text-indigo-200 mt-2">Great effort!</p>
+                            <h1 className="text-3xl font-bold">Aptitude Quiz Completed!</h1>
+                            <p className="text-purple-200 mt-2">Great effort!</p>
                         </motion.div>
 
                         {/* Decorative circles */}
@@ -46,7 +46,7 @@ export default function Result() {
                                 initial={{ scale: 0.5, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ delay: 0.4, type: "spring" }}
-                                className="text-6xl font-extrabold text-indigo-600"
+                                className="text-6xl font-extrabold text-purple-600"
                             >
                                 {score}
                             </motion.div>
@@ -56,11 +56,11 @@ export default function Result() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate("/mock-test")}
+                                onClick={() => navigate("/aptitude-mock-test")}
                                 className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2 hover:bg-gray-800 transition"
                             >
                                 <Home className="w-4 h-4" />
-                                <span>Back to Mock Tests</span>
+                                <span>Back to Aptitude Tests</span>
                             </motion.button>
                         </div>
                     </div>

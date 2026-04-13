@@ -1,5 +1,5 @@
-import Question from "../models/Question.js";
-import TestAttempt from "../models/TestAttempt.js";
+import AptitudeQuestion from "../models/AptitudeQuestion.js";
+import AptitudeTestAttempt from "../models/AptitudeTestAttempt.js";
 import userModel from "../models/userModel.js";
 
 /* START TEST */
@@ -8,14 +8,14 @@ export const startTest = async (req, res) => {
     const userId = req.userId;
     const { testId } = req.body; // testId passed from frontend, maps to testSet
 
-    console.log(`Starting test for user ${userId}, testSet: ${testId}`);
+    console.log(`Starting aptitude test for user ${userId}, testSet: ${testId}`);
 
     try {
-        const attempt = await TestAttempt.create({
+        const attempt = await AptitudeTestAttempt.create({
             userId,
             testSet: testId || 1, // Default to 1 if not provided
             startTime: new Date(),
-            endTime: new Date(Date.now() + 30 * 60 * 1000), // 60 min
+            endTime: new Date(Date.now() + 30 * 60 * 1000), // 30 min
             answers: {}
         });
 
@@ -36,7 +36,7 @@ export const getQuestions = async (req, res) => {
         const { testSet } = req.query;
         const query = testSet ? { testSet } : {};
 
-        const questions = await Question.find(query).select("-correctAnswer");
+        const questions = await AptitudeQuestion.find(query).select("-correctAnswer");
         res.json(questions);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch questions", error: error.message });
@@ -48,7 +48,7 @@ export const saveAnswer = async (req, res) => {
     const { attemptId, questionId, selectedOption } = req.body;
 
     try {
-        await TestAttempt.findByIdAndUpdate(attemptId, {
+        await AptitudeTestAttempt.findByIdAndUpdate(attemptId, {
             $set: {
                 [`answers.${questionId}`]: selectedOption
             }
@@ -69,7 +69,7 @@ export const submitTest = async (req, res) => {
     }
 
     try {
-        const attempt = await TestAttempt.findById(attemptId);
+        const attempt = await AptitudeTestAttempt.findById(attemptId);
 
         if (!attempt) {
             return res.status(404).json({ message: "Test attempt not found" });
@@ -84,7 +84,7 @@ export const submitTest = async (req, res) => {
         const timeTaken = Math.floor((new Date() - new Date(attempt.startTime)) / 1000);
 
         // Fetch questions for this test set
-        const questions = await Question.find({ testSet: attempt.testSet });
+        const questions = await AptitudeQuestion.find({ testSet: attempt.testSet });
         let score = 0;
         let correctAnswers = 0;
 
@@ -101,7 +101,7 @@ export const submitTest = async (req, res) => {
         const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
         // Get attempt number for this user and test set
-        const previousAttempts = await TestAttempt.countDocuments({
+        const previousAttempts = await AptitudeTestAttempt.countDocuments({
             userId: attempt.userId,
             testSet: attempt.testSet,
             isSubmitted: true
@@ -119,8 +119,8 @@ export const submitTest = async (req, res) => {
 
         await attempt.save();
 
-        // Update user quiz statistics
-        await updateUserQuizStats(userId, score, timeTaken);
+        // Update user aptitude quiz statistics
+        await updateUserAptitudeQuizStats(userId, score, timeTaken);
 
         res.json({
             score,
@@ -136,16 +136,16 @@ export const submitTest = async (req, res) => {
     }
 };
 
-/* Helper function to update user quiz statistics */
-async function updateUserQuizStats(userId, score, timeTaken) {
+/* Helper function to update user aptitude quiz statistics */
+async function updateUserAptitudeQuizStats(userId, score, timeTaken) {
     try {
         const user = await userModel.findById(userId);
 
         if (!user) return;
 
-        // Initialize quizStats if it doesn't exist (for existing users)
-        if (!user.quizStats) {
-            user.quizStats = {
+        // Initialize aptitudeQuizStats if it doesn't exist (for existing users)
+        if (!user.aptitudeQuizStats) {
+            user.aptitudeQuizStats = {
                 totalAttempts: 0,
                 totalCompleted: 0,
                 averageScore: 0,
@@ -156,30 +156,30 @@ async function updateUserQuizStats(userId, score, timeTaken) {
         }
 
         // Update basic stats
-        user.quizStats.totalAttempts += 1;
-        user.quizStats.totalCompleted += 1;
-        user.quizStats.totalTimeSpent += Math.floor(timeTaken / 30); // convert to minutes
-        user.quizStats.lastAttemptDate = new Date();
+        user.aptitudeQuizStats.totalAttempts += 1;
+        user.aptitudeQuizStats.totalCompleted += 1;
+        user.aptitudeQuizStats.totalTimeSpent += Math.floor(timeTaken / 30); // convert to minutes
+        user.aptitudeQuizStats.lastAttemptDate = new Date();
 
         // Update best score
-        if (score > user.quizStats.bestScore) {
-            user.quizStats.bestScore = score;
+        if (score > user.aptitudeQuizStats.bestScore) {
+            user.aptitudeQuizStats.bestScore = score;
         }
 
         // Recalculate average score from all completed attempts
-        const allAttempts = await TestAttempt.find({
+        const allAttempts = await AptitudeTestAttempt.find({
             userId,
             isSubmitted: true
         });
 
         if (allAttempts.length > 0) {
             const totalScore = allAttempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
-            user.quizStats.averageScore = Math.round((totalScore / allAttempts.length) * 10) / 10; // Round to 1 decimal
+            user.aptitudeQuizStats.averageScore = Math.round((totalScore / allAttempts.length) * 10) / 10; // Round to 1 decimal
         }
 
         await user.save();
     } catch (error) {
-        console.error("Error updating user quiz stats:", error);
+        console.error("Error updating user aptitude quiz stats:", error);
     }
 }
 
@@ -200,13 +200,13 @@ export const getUserQuizHistory = async (req, res) => {
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        const attempts = await TestAttempt.find(query)
+        const attempts = await AptitudeTestAttempt.find(query)
             .sort({ createdAt: -1 })
             .limit(parseInt(limit))
             .skip(skip)
             .select('-answers'); // Don't send answers in history
 
-        const total = await TestAttempt.countDocuments(query);
+        const total = await AptitudeTestAttempt.countDocuments(query);
 
         res.json({
             success: true,
@@ -234,7 +234,7 @@ export const getUserQuizStats = async (req, res) => {
         }
 
         // Get breakdown by test set
-        const attempts = await TestAttempt.find({
+        const attempts = await AptitudeTestAttempt.find({
             userId,
             isSubmitted: true
         });
@@ -268,7 +268,7 @@ export const getUserQuizStats = async (req, res) => {
 
         res.json({
             success: true,
-            stats: user.quizStats,
+            stats: user.aptitudeQuizStats,
             byTestSet
         });
     } catch (error) {
@@ -282,7 +282,7 @@ export const getUserTestAttempts = async (req, res) => {
 
     try {
         // Get all submitted attempts for this user
-        const attempts = await TestAttempt.find({
+        const attempts = await AptitudeTestAttempt.find({
             userId,
             isSubmitted: true
         }).sort({ createdAt: -1 });
@@ -322,7 +322,7 @@ export const getAttemptDetails = async (req, res) => {
     const { attemptId } = req.params;
 
     try {
-        const attempt = await TestAttempt.findById(attemptId);
+        const attempt = await AptitudeTestAttempt.findById(attemptId);
 
         if (!attempt) {
             return res.status(404).json({ message: "Attempt not found" });
@@ -334,7 +334,7 @@ export const getAttemptDetails = async (req, res) => {
         }
 
         // Get questions for this test set with correct answers
-        const questions = await Question.find({ testSet: attempt.testSet });
+        const questions = await AptitudeQuestion.find({ testSet: attempt.testSet });
 
         // Build detailed results
         const questionResults = questions.map(q => {
