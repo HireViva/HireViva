@@ -11,10 +11,51 @@ const activeConversations = new Map();
 // Helper to validate ObjectId
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+const buildFallbackPrompt = (role, difficulty) => {
+    const prompts = [
+        `Let's continue with ${role}. Explain one project where you made a technical tradeoff and why.`,
+        `At ${difficulty} level, how would you approach debugging a production issue end-to-end?`,
+        `Describe a recent challenge and the concrete steps you took to solve it.`,
+        `What metrics would you track to evaluate the success of your implementation?`
+    ];
+
+    return prompts[Math.floor(Math.random() * prompts.length)];
+};
+
+const buildFallbackFeedback = (session) => {
+    const turns = (session.conversation || []).filter((m) => m.speaker === 'user').length;
+    const base = Math.max(55, Math.min(82, 60 + turns * 2));
+
+    return {
+        overall: base,
+        scores: {
+            technical: Math.max(50, base - 2),
+            communication: Math.max(50, base + 2),
+            problemSolving: Math.max(50, base - 1),
+            confidence: Math.max(50, base)
+        },
+        strengths: [
+            'Stayed engaged through the interview',
+            'Provided answers with clear intent',
+            'Attempted role-relevant technical discussion'
+        ],
+        improvements: [
+            'Add deeper implementation details to each answer',
+            'Use concrete examples with measurable outcomes',
+            'Structure answers as context, approach, and tradeoffs'
+        ],
+        feedback: 'Interview ended with partial evidence of technical depth. Continue practicing concise, structured answers with more concrete implementation detail.'
+    };
+};
+
 // POST /api/interview/start
 const startInterview = async (req, res) => {
     try {
         const { role, difficulty, duration, resumeText } = req.body;
+
+        if (!role || !difficulty || !duration) {
+            return res.status(400).json({ error: 'role, difficulty and duration are required' });
+        }
 
         // Create new interview session
         const session = new InterviewSession({
@@ -27,8 +68,16 @@ const startInterview = async (req, res) => {
 
         await session.save();
 
-        // Get initial greeting from Groq
-        const greeting = await groqService.startInterview(role, difficulty, duration, resumeText);
+        let greeting;
+        let aiAvailable = true;
+        try {
+            // Get initial greeting from Groq
+            greeting = await groqService.startInterview(role, difficulty, duration, resumeText);
+        } catch (aiError) {
+            aiAvailable = false;
+            console.error('Groq start interview failed, using fallback greeting:', aiError.message);
+            greeting = `Hello. I am your AI interviewer for this ${difficulty} ${role} interview. Let's begin with your introduction and then move to technical questions.`;
+        }
 
         // Store conversation context
         // If resumeText is present, we should likely store it in the context as well if needed for future, 
@@ -36,7 +85,10 @@ const startInterview = async (req, res) => {
         const systemPrompt = groqService.generateSystemPrompt(role, difficulty, duration, resumeText);
         activeConversations.set(session._id.toString(), {
             systemPrompt,
-            messages: []
+            messages: [],
+            aiAvailable,
+            role,
+            difficulty
         });
 
         // Add greeting to conversation
@@ -66,6 +118,9 @@ const sendMessage = async (req, res) => {
         if (!sessionId || !isValidId(sessionId)) {
             return res.status(400).json({ error: 'Invalid session ID' });
         }
+        if (!message || typeof message !== 'string' || !message.trim()) {
+            return res.status(400).json({ error: 'Message is required' });
+        }
 
         const session = await InterviewSession.findById(sessionId);
         if (!session) {
@@ -94,7 +149,10 @@ const sendMessage = async (req, res) => {
 
             currentContext = {
                 systemPrompt,
-                messages: history
+                messages: history,
+                aiAvailable: true,
+                role: session.role,
+                difficulty: session.difficulty
             };
 
             activeConversations.set(sessionId, currentContext);
@@ -106,8 +164,19 @@ const sendMessage = async (req, res) => {
             content: message
         });
 
-        // Get AI response
-        const aiResponse = await groqService.getResponse(currentContext.messages, currentContext.systemPrompt);
+        let aiResponse;
+        if (currentContext.aiAvailable === false) {
+            aiResponse = buildFallbackPrompt(currentContext.role || session.role, currentContext.difficulty || session.difficulty);
+        } else {
+            try {
+                // Get AI response
+                aiResponse = await groqService.getResponse(currentContext.messages, currentContext.systemPrompt);
+            } catch (aiError) {
+                console.error('Groq message failed, using fallback response:', aiError.message);
+                currentContext.aiAvailable = false;
+                aiResponse = buildFallbackPrompt(currentContext.role || session.role, currentContext.difficulty || session.difficulty);
+            }
+        }
 
         // Add AI response to conversation
         currentContext.messages.push({
@@ -146,12 +215,18 @@ const endInterview = async (req, res) => {
             return res.status(404).json({ error: 'Session not found' });
         }
 
-        // Generate feedback using Groq
-        const feedback = await groqService.generateFeedback(
-            session.conversation,
-            session.role,
-            session.difficulty
-        );
+        let feedback;
+        try {
+            // Generate feedback using Groq
+            feedback = await groqService.generateFeedback(
+                session.conversation,
+                session.role,
+                session.difficulty
+            );
+        } catch (aiError) {
+            console.error('Groq feedback failed, using fallback feedback:', aiError.message);
+            feedback = buildFallbackFeedback(session);
+        }
 
         // Update session with scores and feedback
         session.scores = {
@@ -169,7 +244,11 @@ const endInterview = async (req, res) => {
         };
 
         session.status = 'completed';
-        await session.save();
+        try {
+            await session.save();
+        } catch (saveError) {
+            console.error('Failed to persist interview end state, returning computed feedback:', saveError.message);
+        }
 
         // Clean up conversation context
         activeConversations.delete(sessionId);

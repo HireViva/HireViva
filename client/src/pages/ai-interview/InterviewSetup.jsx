@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useMediaDevices } from '../../hooks/useMediaDevices'
 import { Briefcase, Clock, Target, Video, Mic } from 'lucide-react'
 import AIInterviewLayout from './AIInterviewLayout'
+import UpgradePrompt from '../../components/UpgradePrompt'
+import { useSubscription } from '../../hooks/useSubscription'
 import './InterviewSetup.css'
 
 const InterviewSetup = () => {
@@ -11,11 +13,19 @@ const InterviewSetup = () => {
     const resumeText = state?.resumeText || null
 
     const { hasPermission, isLoading, error, requestPermissions } = useMediaDevices()
+    const { subscription, canAccessAIInterview, loading: subLoading } = useSubscription()
+    const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
     const [config, setConfig] = useState({
         role: 'Software Engineer',
         duration: 15,
         difficulty: 'Medium'
     })
+
+    useEffect(() => {
+        if (!subLoading && !canAccessAIInterview()) {
+            setShowUpgradePrompt(true)
+        }
+    }, [subLoading, canAccessAIInterview])
 
     const roles = [
         'Software Engineer',
@@ -30,6 +40,11 @@ const InterviewSetup = () => {
     const difficulties = ['Easy', 'Medium', 'Hard']
 
     const handleStartInterview = async () => {
+        if (!canAccessAIInterview()) {
+            setShowUpgradePrompt(true)
+            return
+        }
+
         if (!hasPermission) {
             await requestPermissions()
         } else {
@@ -44,6 +59,14 @@ const InterviewSetup = () => {
 
     return (
         <AIInterviewLayout>
+            {showUpgradePrompt && (
+                <UpgradePrompt
+                    currentTier={subscription?.tier || 'free'}
+                    requiredTier="pro"
+                    feature="AI Interview"
+                    onClose={() => setShowUpgradePrompt(false)}
+                />
+            )}
             <div className="interview-setup fade-in">
                 <div className="setup-container">
                     <div className="setup-header">

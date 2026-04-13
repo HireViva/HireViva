@@ -14,8 +14,6 @@ const footerLinks = {
   company: [
     { label: "About Us", href: "/about-us" },
     { label: "Contact", href: "/contact" },
-    { label: "Pricing", href: "/pricing" },
-
     { label: "Terms and Conditions", href: "/terms-and-conditions" },
     { label: "Cancellation and Refund Policy", href: "/cancellation-and-refund-policy" }
   ]

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useMediaDevices } from '../../hooks/useMediaDevices'
 import { useSpeechRecognition } from '../../hooks/useSpeechRecognition'
@@ -24,6 +24,7 @@ const InterviewRoom = () => {
     const [isProcessing, setIsProcessing] = useState(false)
     const [canUserSpeak, setCanUserSpeak] = useState(false)
     const [statusMessage, setStatusMessage] = useState('Initializing...')
+    const selectedVoiceRef = useRef(null)
 
     // Handle speech recognition - only process when user is allowed to speak
     const handleSpeechResult = useCallback(async (transcript) => {
@@ -98,6 +99,36 @@ const InterviewRoom = () => {
         isRecording && !isMuted && canUserSpeak && !aiSpeaking
     )
 
+    // Lock a single AI voice for the whole interview for consistency
+    useEffect(() => {
+        if (!('speechSynthesis' in window)) return
+
+        const pickVoice = () => {
+            if (selectedVoiceRef.current) return
+
+            const voices = window.speechSynthesis.getVoices()
+            if (!voices.length) return
+
+            const preferred = voices.find(voice =>
+                voice.lang?.startsWith('en') &&
+                (
+                    voice.name.includes('Microsoft Zira') ||
+                    voice.name.includes('Google US English') ||
+                    voice.name.includes('Samantha')
+                )
+            ) || voices.find(voice => voice.lang?.startsWith('en')) || voices[0]
+
+            selectedVoiceRef.current = preferred
+        }
+
+        pickVoice()
+        window.speechSynthesis.onvoiceschanged = pickVoice
+
+        return () => {
+            window.speechSynthesis.onvoiceschanged = null
+        }
+    }, [])
+
     // Text-to-speech for AI responses
     const speakText = (text) => {
         return new Promise((resolve) => {
@@ -112,17 +143,8 @@ const InterviewRoom = () => {
                 utterance.pitch = 1.0
                 utterance.volume = 1.0
 
-                // Prioritize natural-sounding female voices
-                const voices = window.speechSynthesis.getVoices()
-                const preferredVoice = voices.find(voice =>
-                    (voice.name.includes('Female') ||
-                        voice.name.includes('Google US English') ||
-                        voice.name.includes('Microsoft Zira') ||
-                        voice.name.includes('Samantha')) &&
-                    voice.lang.startsWith('en')
-                )
-                if (preferredVoice) {
-                    utterance.voice = preferredVoice
+                if (selectedVoiceRef.current) {
+                    utterance.voice = selectedVoiceRef.current
                 }
 
                 utterance.onend = () => {
@@ -210,6 +232,10 @@ const InterviewRoom = () => {
         setStatusMessage('Ending interview...')
 
         if (sessionId) {
+            if (String(sessionId).startsWith('mock-')) {
+                navigate(`/ai-interview/results/${sessionId}`)
+                return
+            }
             try {
                 await interviewService.endInterview(sessionId)
                 navigate(`/ai-interview/results/${sessionId}`)

@@ -56,21 +56,11 @@ export default function AptitudeResult() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate("/")}
+                                onClick={() => navigate("/aptitude-mock-test")}
                                 className="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2 hover:bg-gray-800 transition"
                             >
                                 <Home className="w-4 h-4" />
-                                <span>Back to Home</span>
-                            </motion.button>
-
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => navigate("/aptitude-mock-test")}
-                                className="w-full bg-white text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center justify-center space-x-2"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                <span>Try Again</span>
+                                <span>Back to Aptitude Tests</span>
                             </motion.button>
                         </div>
                     </div>

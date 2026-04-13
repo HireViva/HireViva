@@ -1,4 +1,4 @@
-# LastMinuteEngineering
+# HireViva
 
 **Your Tech Interview Hub** - A comprehensive platform for engineering students to excel in exams and technical interviews with free resources, concise notes, MAKAUT PYQs, and AI-powered interview practice.
 

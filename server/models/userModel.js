@@ -12,7 +12,16 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false, // Not required for Google OAuth users
+    },
+    googleId: {
+        type: String,
+        default: null,
+    },
+    authProvider: {
+        type: String,
+        enum: ['local', 'google'],
+        default: 'local',
     },
     verifyOtp: {
         type: Number,
@@ -49,6 +58,37 @@ const userSchema = new mongoose.Schema({
         bestScore: { type: Number, default: 0 },
         totalTimeSpent: { type: Number, default: 0 }, // in minutes
         lastAttemptDate: { type: Date }
+    },
+    // Subscription fields
+    subscriptionTier: {
+        type: String,
+        enum: ['free', 'basic', 'pro'],
+        default: 'free'
+    },
+    subscriptionStatus: {
+        type: String,
+        enum: ['active', 'expired', 'cancelled'],
+        default: 'active'
+    },
+    subscriptionStartDate: {
+        type: Date,
+        default: null
+    },
+    subscriptionEndDate: {
+        type: Date,
+        default: null
+    },
+    mockTestsUsed: {
+        type: Number,
+        default: 0
+    },
+    aiInterviewsUsed: {
+        type: Number,
+        default: 0
+    },
+    razorpayCustomerId: {
+        type: String,
+        default: null
     }
 });
 

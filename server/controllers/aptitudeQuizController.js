@@ -102,7 +102,7 @@ export const submitTest = async (req, res) => {
 
         // Get attempt number for this user and test set
         const previousAttempts = await AptitudeTestAttempt.countDocuments({
-            userId,
+            userId: attempt.userId,
             testSet: attempt.testSet,
             isSubmitted: true
         });
@@ -275,3 +275,100 @@ export const getUserQuizStats = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch quiz stats", error: error.message });
     }
 };
+
+/* GET USER'S LATEST ATTEMPT FOR EACH TEST (for dashboard display) */
+export const getUserTestAttempts = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        // Get all submitted attempts for this user
+        const attempts = await AptitudeTestAttempt.find({
+            userId,
+            isSubmitted: true
+        }).sort({ createdAt: -1 });
+
+        // Get the latest attempt for each testSet
+        const latestAttempts = {};
+        attempts.forEach(attempt => {
+            const testSet = attempt.testSet;
+            if (!latestAttempts[testSet]) {
+                latestAttempts[testSet] = {
+                    attemptId: attempt._id,
+                    testId: testSet,
+                    score: attempt.score,
+                    percentage: attempt.percentage,
+                    correctAnswers: attempt.correctAnswers,
+                    totalQuestions: attempt.totalQuestions,
+                    incorrectAnswers: attempt.incorrectAnswers,
+                    timeTaken: attempt.timeTaken,
+                    completedAt: attempt.createdAt,
+                    attemptNumber: attempt.attemptNumber
+                };
+            }
+        });
+
+        res.json({
+            success: true,
+            attempts: latestAttempts
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch user attempts", error: error.message });
+    }
+};
+
+/* GET DETAILED ATTEMPT RESULTS WITH CORRECT ANSWERS */
+export const getAttemptDetails = async (req, res) => {
+    const userId = req.userId;
+    const { attemptId } = req.params;
+
+    try {
+        const attempt = await AptitudeTestAttempt.findById(attemptId);
+
+        if (!attempt) {
+            return res.status(404).json({ message: "Attempt not found" });
+        }
+
+        // Ensure user owns this attempt
+        if (attempt.userId.toString() !== userId) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
+        // Get questions for this test set with correct answers
+        const questions = await AptitudeQuestion.find({ testSet: attempt.testSet });
+
+        // Build detailed results
+        const questionResults = questions.map(q => {
+            const userAnswer = attempt.answers?.get(q._id.toString());
+            const isCorrect = userAnswer === q.correctAnswer;
+
+            return {
+                questionId: q._id,
+                questionText: q.question,
+                options: q.options,
+                userAnswer: userAnswer !== undefined ? userAnswer : null,
+                correctAnswer: q.correctAnswer,
+                isCorrect,
+                marks: q.marks
+            };
+        });
+
+        res.json({
+            success: true,
+            attempt: {
+                id: attempt._id,
+                testSet: attempt.testSet,
+                score: attempt.score,
+                percentage: attempt.percentage,
+                correctAnswers: attempt.correctAnswers,
+                incorrectAnswers: attempt.incorrectAnswers,
+                totalQuestions: attempt.totalQuestions,
+                timeTaken: attempt.timeTaken,
+                completedAt: attempt.createdAt
+            },
+            questions: questionResults
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch attempt details", error: error.message });
+    }
+};
+

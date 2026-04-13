@@ -375,3 +375,472 @@
     animation-duration: 700ms;
   }
 }
+
+/* ============================================
+   TRUSTED COMPANIES SECTION
+   Two-row infinite scrolling logo slider
+   ============================================ */
+.trusted-companies-section {
+  position: relative;
+  width: 100%;
+  padding: 80px 0 100px;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+      hsl(240, 50%, 3%) 0%,
+      hsl(240, 40%, 6%) 50%,
+      hsl(240, 50%, 3%) 100%);
+}
+
+.trusted-companies-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, hsla(270, 80%, 60%, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.trusted-companies-section::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  transform: translateY(-50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, hsla(190, 100%, 60%, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.trusted-container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+  z-index: 1;
+}
+
+.trusted-badge {
+  display: inline-block;
+  padding: 8px 20px;
+  margin-bottom: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #f97316;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.1) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 50px;
+}
+
+.trusted-heading {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.trusted-heading .gradient-text {
+  background: linear-gradient(135deg, hsl(270, 80%, 60%) 0%, hsl(280, 100%, 70%) 50%, hsl(190, 100%, 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.trusted-subtext {
+  max-width: 700px;
+  margin: 0 auto 60px;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.logo-sliders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.logo-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 15px 0;
+}
+
+.slider-fade-left,
+.slider-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 150px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.slider-fade-left {
+  left: 0;
+  background: linear-gradient(90deg, hsl(240, 50%, 3%) 0%, transparent 100%);
+}
+
+.slider-fade-right {
+  right: 0;
+  background: linear-gradient(270deg, hsl(240, 50%, 3%) 0%, transparent 100%);
+}
+
+.logo-slider-track {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  width: max-content;
+  will-change: transform;
+}
+
+/* Faster animation: 18s instead of 30s */
+.logo-slider-track.scroll-left-to-right {
+  animation: scroll-left-to-right 18s linear infinite;
+}
+
+.logo-slider-track.scroll-right-to-left {
+  animation: scroll-right-to-left 18s linear infinite;
+}
+
+.logo-slider-wrapper:hover .logo-slider-track {
+  animation-play-state: paused;
+}
+
+.logo-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 60px;
+  padding: 10px;
+  transition: transform 0.3s ease;
+}
+
+/* Logos always show in full color - no grayscale */
+.logo-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+}
+
+.logo-item:hover img {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+@keyframes scroll-left-to-right {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scroll-right-to-left {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Trusted Companies Responsive */
+@media (max-width: 1024px) {
+  .trusted-companies-section {
+    padding: 60px 0 80px;
+  }
+
+  .logo-sliders-container {
+    gap: 20px;
+  }
+
+  .logo-item {
+    width: 120px;
+    height: 50px;
+  }
+
+  .logo-slider-track {
+    gap: 40px;
+  }
+
+  .slider-fade-left,
+  .slider-fade-right {
+    width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trusted-companies-section {
+    padding: 50px 0 60px;
+  }
+
+  .trusted-badge {
+    font-size: 10px;
+    padding: 6px 16px;
+  }
+
+  .trusted-subtext {
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+  }
+
+  .logo-sliders-container {
+    gap: 15px;
+  }
+
+  .logo-item {
+    width: 100px;
+    height: 45px;
+  }
+
+  .logo-slider-track {
+    gap: 30px;
+  }
+
+  .logo-slider-track.scroll-left-to-right,
+  .logo-slider-track.scroll-right-to-left {
+    animation-duration: 12s;
+  }
+
+  .slider-fade-left,
+  .slider-fade-right {
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trusted-companies-section {
+    padding: 40px 0 50px;
+  }
+
+  .trusted-heading {
+    font-size: 1.75rem;
+  }
+
+  .trusted-subtext {
+    font-size: 0.85rem;
+  }
+
+  .logo-sliders-container {
+    gap: 12px;
+  }
+
+  .logo-item {
+    width: 80px;
+    height: 40px;
+  }
+
+  .logo-slider-track {
+    gap: 25px;
+  }
+
+  .logo-slider-track.scroll-left-to-right,
+  .logo-slider-track.scroll-right-to-left {
+    animation-duration: 10s;
+  }
+
+  .slider-fade-left,
+  .slider-fade-right {
+    width: 40px;
+  }
+}
+
+/* ============================================
+   TESTIMONIALS SECTION
+   Student success stories with profile cards
+   ============================================ */
+.testimonials-section {
+  position: relative;
+  width: 100%;
+  padding: 80px 0;
+  background: linear-gradient(180deg,
+      hsl(240, 50%, 3%) 0%,
+      hsl(240, 40%, 5%) 100%);
+}
+
+.testimonials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.testimonials-heading {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: #ffffff;
+  text-align: left;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.testimonials-heading .gradient-text {
+  background: linear-gradient(135deg, hsl(270, 80%, 60%) 0%, hsl(190, 100%, 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.testimonials-subtext {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 50px;
+  max-width: 800px;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  background: linear-gradient(145deg,
+      hsl(240, 40%, 8%) 0%,
+      hsl(240, 45%, 6%) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.testimonial-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.testimonial-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.testimonial-info {
+  flex: 1;
+}
+
+.testimonial-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.testimonial-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.linkedin-link {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.linkedin-link:hover {
+  transform: scale(1.15);
+}
+
+.testimonial-role {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 2px 0;
+}
+
+.testimonial-company {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.testimonial-text {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+/* Testimonials Responsive */
+@media (max-width: 1024px) {
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials-section {
+    padding: 60px 0;
+  }
+
+  .testimonials-heading {
+    text-align: center;
+  }
+
+  .testimonials-subtext {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .testimonial-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonials-section {
+    padding: 50px 0;
+  }
+
+  .testimonials-subtext {
+    font-size: 0.9rem;
+  }
+
+  .testimonial-avatar {
+    width: 46px;
+    height: 46px;
+  }
+
+  .testimonial-name {
+    font-size: 0.95rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.85rem;
+  }
+}

@@ -1,47 +1,54 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Zap, Crown, Rocket } from "lucide-react";
+import { useState, useEffect } from 'react';
+import api from '../api';
 
 const plans = [
   {
+    id: "free",
     name: "Free",
     price: "₹0",
     period: "/month",
     icon: Zap,
     features: [
-      "Access to basic features",
-      "Limited interview practice",
-      "Everythhing in Basic",
-      "AI-powered coding sheets",
+      "2 Mock Tests (Very Limited)",
+      "1 AI Interview (Very Limited)",
+      "Basic Analytics",
+      "Community Support",
     ],
     color: "from-cyan-accent to-cyan-accent/70",
     popular: false,
   },
   {
+    id: "basic",
     name: "Basic",
-    price: "₹99",
+    price: "₹299",
     period: "/month",
     icon: Crown,
     features: [
-      "Everything in Basic",
-      "AI-powered practice tests",
-      "Video explanations",
-      "Priority support",
-      "Offline access",
+      "6 Mock Tests (Limited Access)",
+      "5 AI Interviews (Limited Access)",
+      "Detailed Analytics",
+      "Performance Tracking",
+      "Email Support",
+      "Progress Reports",
     ],
     color: "from-purple-glow to-purple-accent",
     popular: true,
   },
   {
+    id: "pro",
     name: "Pro",
-    price: "₹199",
+    price: "₹599",
     period: "/month",
     icon: Rocket,
     features: [
-      "Everything in Pro",
-      "1-on-1 mentorship",
-      "Interview preparation",
-      "Resume review",
-      "Extended updates",
+      "Unlimited Mock Tests (Full Access)",
+      "Unlimited AI Interviews (Full Access)",
+      "Advanced Analytics",
+      "Priority Support",
+      "Resume Analysis",
+      "All Premium Features",
     ],
     color: "from-green-accent to-emerald-500",
     popular: false,
@@ -88,6 +95,134 @@ const cardVariants = {
 };
 
 export default function PricingModal({ isOpen, onClose }) {
+  const [subscription, setSubscription] = useState(null);
+  const [processingPlan, setProcessingPlan] = useState(null);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+  useEffect(() => {
+    // Load Razorpay script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchSubscriptionStatus = async () => {
+      try {
+        const response = await api.get('/subscription/status');
+        if (response.data) {
+          setSubscription(response.data.subscription);
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription:', error);
+        setSubscription({
+          tier: 'free',
+          status: 'active',
+          mockTests: { used: 0, limit: 2, remaining: 2 },
+          aiInterviews: { used: 0, limit: 1, remaining: 1 },
+        });
+      }
+    };
+    fetchSubscriptionStatus();
+  }, [isOpen]);
+
+  const handleSubscribe = async (plan) => {
+    if (plan.id === 'free') return;
+
+    try {
+      setProcessingPlan(plan.id);
+
+      // Create order
+      const response = await api.post('/payment/createorder', {
+        subscriptionType: plan.id,
+      });
+
+      const data = response.data;
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to create order');
+      }
+
+      // Open Razorpay checkout
+      const options = {
+        key: RAZORPAY_KEY,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: 'HireViva',
+        description: `${plan.name} Plan Subscription`,
+        order_id: data.order.id,
+        handler: async function (response) {
+          try {
+            // Verify payment
+            const verifyResponse = await api.post('/payment/verifypayment', {
+              order_id: data.order.id,
+              payment_id: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+              subscriptionType: plan.id,
+            });
+
+            const verifyData = verifyResponse.data;
+
+            if (verifyData.success) {
+              alert('Payment successful! Your subscription is now active.');
+              onClose();
+              window.location.reload(); // Refresh to update subscription status
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+          } finally {
+            setProcessingPlan(null);
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#8B5CF6',
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', () => {
+        alert('Payment failed. Please try again.');
+        setProcessingPlan(null);
+      });
+      razorpay.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      if (error.response?.status === 401) {
+        alert('Please login to subscribe');
+      } else {
+        alert('Failed to process payment. Please try again.');
+      }
+      setProcessingPlan(null);
+    }
+  };
+
+  const getButtonText = (plan) => {
+    if (processingPlan === plan.id) return 'Processing...';
+    if (subscription?.tier === plan.id) return 'Current Plan';
+    if (plan.id === 'free') return 'Free Forever';
+    return 'Get Started';
+  };
+
+  const isButtonDisabled = (plan) => {
+    return processingPlan === plan.id || subscription?.tier === plan.id || plan.id === 'free';
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -150,11 +285,10 @@ export default function PricingModal({ isOpen, onClose }) {
                     initial="hidden"
                     animate="visible"
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className={`relative p-6 rounded-2xl border transition-all duration-300 ${
-                      plan.popular
-                        ? "glass-card-glow border-purple-glow/50"
-                        : "glass-effect border-white/10 hover:border-white/20"
-                    }`}
+                    className={`relative p-6 rounded-2xl border transition-all duration-300 ${plan.popular
+                      ? "glass-card-glow border-purple-glow/50"
+                      : "glass-effect border-white/10 hover:border-white/20"
+                      }`}
                   >
                     {/* Popular Badge */}
                     {plan.popular && (
@@ -196,11 +330,10 @@ export default function PricingModal({ isOpen, onClose }) {
                         >
                           <Check
                             size={16}
-                            className={`flex-shrink-0 ${
-                              plan.popular
-                                ? "text-purple-glow"
-                                : "text-green-accent"
-                            }`}
+                            className={`flex-shrink-0 ${plan.popular
+                              ? "text-purple-glow"
+                              : "text-green-accent"
+                              }`}
                           />
                           {feature}
                         </li>
@@ -211,13 +344,14 @@ export default function PricingModal({ isOpen, onClose }) {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                        plan.popular
-                          ? "btn-primary-gradient"
-                          : "glass-effect border border-white/20 text-foreground hover:bg-white/10"
-                      }`}
+                      onClick={() => handleSubscribe(plan)}
+                      disabled={isButtonDisabled(plan)}
+                      className={`w-full py-3 rounded-xl font-semibold transition-all ${plan.popular
+                        ? "btn-primary-gradient"
+                        : "glass-effect border border-white/20 text-foreground hover:bg-white/10"
+                        } ${isButtonDisabled(plan) ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      Get Started
+                      {getButtonText(plan)}
                     </motion.button>
                   </motion.div>
                 );

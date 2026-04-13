@@ -6,20 +6,27 @@ import {
     saveAnswer,
     submitTest,
     getUserQuizHistory,
-    getUserQuizStats
+    getUserQuizStats,
+    getUserTestAttempts,
+    getAttemptDetails
 } from '../controllers/aptitudeQuizController.js';
+import { checkMockTestAccess, incrementMockTestUsage } from '../middleware/subscriptionMiddleware.js';
 import AptitudeQuestion from '../models/AptitudeQuestion.js'; // Keep for tests list
 
 const router = express.Router();
 
-router.post("/start", userAuth, startTest);
+router.post("/start", userAuth, checkMockTestAccess, startTest);
 router.get("/questions", userAuth, getQuestions);
 router.post("/save-answer", userAuth, saveAnswer);
-router.post("/submit", userAuth, submitTest);
+router.post("/submit", userAuth, incrementMockTestUsage, submitTest);
 
 // Quiz history and statistics
 router.get("/history", userAuth, getUserQuizHistory);
 router.get("/stats", userAuth, getUserQuizStats);
+
+// User attempts for dashboard display
+router.get("/user-attempts", userAuth, getUserTestAttempts);
+router.get("/attempt/:attemptId/details", userAuth, getAttemptDetails);
 
 // Keep the route to list available tests for the dashboard
 router.get('/tests', userAuth, async (req, res) => {
@@ -37,3 +44,4 @@ router.get('/tests', userAuth, async (req, res) => {
 });
 
 export default router;
+

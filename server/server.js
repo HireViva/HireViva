@@ -10,6 +10,8 @@ import quizRouter from './routes/quizRoutes.js';
 import interviewRouter from './routes/interviewRoutes.js';
 import resumeRouter from './routes/resumeRoutes.js';
 import aptitudeQuizRouter from './routes/aptitudeQuizRoutes.js';
+import paymentRouter from './routes/paymentRoutes.js';
+import subscriptionRouter from './routes/subscriptionRoutes.js';
 
 
 const app = express();
@@ -32,6 +34,8 @@ app.use('/api/quiz', quizRouter);
 app.use('/api/interview', interviewRouter);
 app.use('/api/resume', resumeRouter);
 app.use('/api/aptitude-quiz', aptitudeQuizRouter);
+app.use('/api/payment', paymentRouter);
+app.use('/api/subscription', subscriptionRouter);
 
 
 app.listen(PORT, () => {
