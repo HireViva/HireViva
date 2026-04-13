@@ -32,19 +32,19 @@ const cardVariants = {
 const impactStats = [
     {
         icon: Users,
-        number: "10K+",
+        number: "10+",
         label: "Active Users",
         subtitle: "and growing"
     },
     {
         icon: TrendingUp,
-        number: "50K+",
+        number: "50+",
         label: "Practice Sessions",
         subtitle: "per month"
     },
     {
         icon: Award,
-        number: "500+",
+        number: "5+",
         label: "Success Stories",
         subtitle: "till date"
     },
@@ -112,21 +112,21 @@ export default function AboutUs() {
 
                             <div className="max-w-4xl mx-auto space-y-4 text-muted-foreground">
                                 <p className="text-base sm:text-lg leading-relaxed">
-                                    We started back in 2024 with our{" "}
+                                    We started back in 2026 with our{" "}
                                     <a href="#" className="text-purple-glow hover:text-cyan-accent transition-colors underline">
                                         vision to empower students
                                     </a>
                                     . The idea of building a comprehensive platform came into vision when we realized the gap between academic learning and industry requirements.
                                 </p>
                                 <p className="text-base sm:text-lg leading-relaxed">
-                                    We started with a simple goal and evolved into a full-fledged interview preparation platform in 2025.
+                                    We started with a simple goal and evolved into a full-fledged interview preparation platform in 2026.
                                 </p>
                             </div>
 
                             <div className="max-w-4xl mx-auto space-y-4 text-muted-foreground pt-6">
                                 <p className="text-base sm:text-lg leading-relaxed">
                                     Our vision is to make interview preparation feel seamless and enjoyable, removing the overwhelming factor which you find in most places. We cover{" "}
-                                    <span className="text-foreground font-semibold">DSA, Core Subjects, System Design,</span> and{" "}
+                                    <span className="text-foreground font-semibold">DSA, Core Subjects,</span> and{" "}
                                     <span className="text-foreground font-semibold">Communication Skills</span> as of today, and we plan to add much more in the future.
                                 </p>
                             </div>
