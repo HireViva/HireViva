@@ -12,6 +12,7 @@ import resumeRouter from './routes/resumeRoutes.js';
 import aptitudeQuizRouter from './routes/aptitudeQuizRoutes.js';
 import paymentRouter from './routes/paymentRoutes.js';
 import subscriptionRouter from './routes/subscriptionRoutes.js';
+import initCronJobs from './utils/cronJobs.js';
 
 
 const app = express();
@@ -19,10 +20,20 @@ const PORT = process.env.PORT || 3000;
 
 connectDB();
 
+// Initialize cron jobs for subscription management
+initCronJobs();
+
+// Raw body parsing for Razorpay webhook signature verification
+// Must be registered BEFORE express.json() for the webhook route
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:8080', 'https://hireviva.vercel.app'];
+if (process.env.CLIENT_URL) allowedOrigins.push(process.env.CLIENT_URL);
+
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:8080"],
+    origin: allowedOrigins,
     credentials: true
 }));
 
