@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false, // Not required for Google OAuth users
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     googleId: {
         type: String,
         default: null,
@@ -65,6 +70,10 @@ const userSchema = new mongoose.Schema({
         enum: ['free', 'basic', 'pro'],
         default: 'free'
     },
+    isSubscribed: {
+        type: Boolean,
+        default: false
+    },
     subscriptionStatus: {
         type: String,
         enum: ['active', 'expired', 'cancelled'],
@@ -90,7 +99,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     }
-});
+}, { timestamps: true });
 
 const userModel = mongoose.models.user || mongoose.model('user', userSchema);
 export default userModel;

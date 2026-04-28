@@ -1,18 +1,19 @@
 import userModel from '../models/userModel.js';
+import { SUBSCRIPTION_PLANS } from '../config/subscriptionPlans.js';
 
-// Subscription limits
+// Get limits from centralized config
 const SUBSCRIPTION_LIMITS = {
     free: {
-        mockTests: 2,
-        aiInterviews: 1
+        mockTests: SUBSCRIPTION_PLANS.free.mockTestsLimit,
+        aiInterviews: SUBSCRIPTION_PLANS.free.aiInterviewLimit
     },
     basic: {
-        mockTests: 6,
-        aiInterviews: 5
+        mockTests: SUBSCRIPTION_PLANS.basic.mockTestsLimit,
+        aiInterviews: SUBSCRIPTION_PLANS.basic.aiInterviewLimit
     },
     pro: {
-        mockTests: Infinity,
-        aiInterviews: Infinity
+        mockTests: SUBSCRIPTION_PLANS.pro.mockTestsLimit,
+        aiInterviews: SUBSCRIPTION_PLANS.pro.aiInterviewLimit
     }
 };
 

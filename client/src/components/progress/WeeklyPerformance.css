@@ -1,0 +1,66 @@
+.weekly-performance {
+  width: 100%;
+}
+
+.weekly-performance h3 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.weekly-performance .subtitle {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-wrapper {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.chart-line {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: stroke-width 0.3s ease;
+}
+
+.chart-line:hover {
+  stroke-width: 3;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .chart-wrapper {
+    padding: 0.5rem;
+  }
+
+  .legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
