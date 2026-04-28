@@ -35,6 +35,7 @@ import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
 import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
 import AptitudeTest from "./pages/AptitudeTest.jsx";
 import AptitudeResult from "./pages/AptitudeResult.jsx";
+import Progress from "./pages/Progress.jsx";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/aptitude-mock-test/:testId/start" element={<ProtectedRoute><AptitudeStartTest /></ProtectedRoute>} />
             <Route path="/aptitude-mock-test/:testId/attempt" element={<ProtectedRoute><AptitudeTest /></ProtectedRoute>} />
             <Route path="/aptitude-mock-test/:testId/result" element={<ProtectedRoute><AptitudeResult /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
