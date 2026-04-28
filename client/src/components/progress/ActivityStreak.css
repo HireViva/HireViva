@@ -1,0 +1,95 @@
+.activity-streak {
+  width: 100%;
+}
+
+.activity-streak h3 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.activity-week {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.activity-day {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activity-day.active {
+  background: linear-gradient(135deg, #00ff88, #00ccbb);
+  border-color: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+}
+
+.activity-day.active:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
+}
+
+.activity-day.inactive {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activity-day.inactive:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.legend-info {
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a0a0a0;
+  font-size: 0.85rem;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-dot.active {
+  background: linear-gradient(135deg, #00ff88, #00ccbb);
+}
+
+.legend-dot.inactive {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .activity-day {
+    width: 16px;
+    height: 16px;
+  }
+
+  .activity-week {
+    gap: 0.25rem;
+  }
+
+  .calendar-grid {
+    gap: 0.25rem;
+  }
+}
