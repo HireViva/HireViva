@@ -14,6 +14,14 @@ export const createOrder = async (req, res) => {
         const plan = req.body.plan || req.body.subscriptionType;
         const userId = req.userId;
 
+        // Validate userId
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User ID not found. Please login again.'
+            });
+        }
+
         // Validate plan
         if (!plan || !isValidPaidPlan(plan)) {
             return res.status(400).json({
@@ -22,47 +30,70 @@ export const createOrder = async (req, res) => {
             });
         }
 
+        // Check if Razorpay credentials are configured
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+            console.error('Razorpay credentials not configured');
+            return res.status(500).json({
+                success: false,
+                message: 'Payment system not configured. Please contact support.'
+            });
+        }
+
         const planConfig = SUBSCRIPTION_PLANS[plan];
-        const razorpayInstance = createRazorpayInstance();
+        
+        try {
+            const razorpayInstance = createRazorpayInstance();
 
-        const receiptId = `receipt_${plan}_${userId}_${Date.now()}`;
+            // Generate short receipt ID (max 40 chars for Razorpay)
+            // Format: receipt_<plan>_<short_user_id>_<timestamp>
+            const shortUserId = userId.toString().substring(0, 8); // Use first 8 chars of ObjectId
+            const timestamp = Date.now().toString().substring(0, 8); // Use first 8 chars of timestamp
+            const receiptId = `receipt_${plan}_${shortUserId}_${timestamp}`.substring(0, 40);
 
-        const options = {
-            amount: planConfig.priceInPaise,
-            currency: planConfig.currency,
-            receipt: receiptId,
-            notes: {
-                userId: userId.toString(),
-                plan
-            }
-        };
+            const options = {
+                amount: planConfig.priceInPaise,
+                currency: planConfig.currency,
+                receipt: receiptId,
+                notes: {
+                    userId: userId.toString(),
+                    plan
+                }
+            };
 
-        // Create Razorpay order
-        const order = await razorpayInstance.orders.create(options);
+            // Create Razorpay order
+            const order = await razorpayInstance.orders.create(options);
 
-        // Store payment record with status "created"
-        const payment = await Payment.create({
-            userId,
-            orderId: order.id,
-            amount: planConfig.price,
-            currency: order.currency,
-            plan,
-            status: 'created',
-            receipt: order.receipt
-        });
+            // Store payment record with status "created"
+            const payment = await Payment.create({
+                userId,
+                orderId: order.id,
+                amount: planConfig.price,
+                currency: order.currency,
+                plan,
+                status: 'created',
+                receipt: order.receipt
+            });
 
-        return res.status(200).json({
-            success: true,
-            order,
-            paymentRecordId: payment._id,
-            key: process.env.RAZORPAY_KEY_ID
-        });
+            return res.status(200).json({
+                success: true,
+                order,
+                paymentRecordId: payment._id,
+                key: process.env.RAZORPAY_KEY_ID
+            });
+        } catch (razorpayError) {
+            console.error('Razorpay API error:', razorpayError);
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to create payment order. Please try again.',
+                error: process.env.NODE_ENV === 'development' ? razorpayError.message : undefined
+            });
+        }
     } catch (error) {
         console.error('Create order error:', error);
         return res.status(500).json({
             success: false,
             message: 'Failed to create order',
-            error: error.message
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 };
@@ -81,6 +112,14 @@ export const verifyPayment = async (req, res) => {
         const plan = req.body.plan || req.body.subscriptionType;
         const userId = req.userId;
 
+        // Validate userId
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User ID not found. Please login again.'
+            });
+        }
+
         // Validate inputs
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return res.status(400).json({
@@ -92,9 +131,19 @@ export const verifyPayment = async (req, res) => {
         // Find the payment record
         const payment = await Payment.findOne({ orderId: razorpay_order_id, userId });
         if (!payment) {
+            console.error(`Payment record not found for orderId: ${razorpay_order_id}, userId: ${userId}`);
             return res.status(404).json({
                 success: false,
                 message: 'Payment record not found'
+            });
+        }
+
+        // Check Razorpay secret is configured
+        if (!process.env.RAZORPAY_KEY_SECRET) {
+            console.error('Razorpay secret not configured');
+            return res.status(500).json({
+                success: false,
+                message: 'Payment verification not configured'
             });
         }
 
@@ -111,8 +160,10 @@ export const verifyPayment = async (req, res) => {
             payment.status = 'failed';
             payment.paymentId = razorpay_payment_id;
             payment.signature = razorpay_signature;
+            payment.failureReason = 'Signature mismatch';
             await payment.save();
 
+            console.error(`Payment signature verification failed for orderId: ${razorpay_order_id}`);
             return res.status(400).json({
                 success: false,
                 message: 'Payment verification failed. Signature mismatch.'
@@ -141,9 +192,19 @@ export const verifyPayment = async (req, res) => {
         const subscriptionStartDate = new Date();
         const subscriptionEndDate = new Date();
         const planConfig = SUBSCRIPTION_PLANS[paymentPlan];
+        
+        if (!planConfig) {
+            console.error(`Invalid plan config for plan: ${paymentPlan}`);
+            return res.status(500).json({
+                success: false,
+                message: 'Invalid subscription plan configuration'
+            });
+        }
+
         subscriptionEndDate.setDate(subscriptionEndDate.getDate() + (planConfig?.durationDays || 30));
 
-        await userModel.findByIdAndUpdate(userId, {
+        // Update user subscription
+        const updatedUser = await userModel.findByIdAndUpdate(userId, {
             subscriptionTier: paymentPlan,
             isSubscribed: true,
             subscriptionStatus: 'active',
@@ -151,7 +212,11 @@ export const verifyPayment = async (req, res) => {
             subscriptionEndDate,
             mockTestsUsed: 0,
             aiInterviewsUsed: 0
-        });
+        }, { new: true });
+
+        if (!updatedUser) {
+            throw new Error('Failed to update user subscription');
+        }
 
         // Create Subscription record
         // First, expire any existing active subscriptions for this user
@@ -160,7 +225,7 @@ export const verifyPayment = async (req, res) => {
             { $set: { status: 'expired' } }
         );
 
-        await Subscription.create({
+        const subscription = await Subscription.create({
             userId,
             plan: paymentPlan,
             startDate: subscriptionStartDate,
@@ -168,6 +233,8 @@ export const verifyPayment = async (req, res) => {
             status: 'active',
             paymentId: payment._id
         });
+
+        console.log(`Payment verified successfully for user ${userId}, plan: ${paymentPlan}`);
 
         return res.status(200).json({
             success: true,
@@ -183,7 +250,7 @@ export const verifyPayment = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Failed to verify payment',
-            error: error.message
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 };

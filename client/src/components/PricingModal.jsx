@@ -140,6 +140,16 @@ export default function PricingModal({ isOpen, onClose }) {
     try {
       setProcessingPlan(plan.id);
 
+      // Validate Razorpay key
+      if (!RAZORPAY_KEY) {
+        console.error('Razorpay key not configured');
+        alert('Payment system not properly configured. Please contact support.');
+        setProcessingPlan(null);
+        return;
+      }
+
+      console.log(`Creating order for plan: ${plan.id}`);
+
       // Create order
       const response = await api.post('/payment/createorder', {
         subscriptionType: plan.id,
@@ -148,8 +158,21 @@ export default function PricingModal({ isOpen, onClose }) {
       const data = response.data;
 
       if (!data.success) {
-        throw new Error(data.message || 'Failed to create order');
+        const errorMessage = data.message || 'Failed to create order';
+        console.error('Order creation failed:', errorMessage);
+        alert(errorMessage);
+        setProcessingPlan(null);
+        return;
       }
+
+      if (!data.order || !data.order.id) {
+        console.error('Invalid order response:', data);
+        alert('Invalid payment order. Please try again.');
+        setProcessingPlan(null);
+        return;
+      }
+
+      console.log('Order created successfully:', data.order.id);
 
       // Open Razorpay checkout
       const options = {
@@ -161,26 +184,40 @@ export default function PricingModal({ isOpen, onClose }) {
         order_id: data.order.id,
         handler: async function (response) {
           try {
+            console.log('Razorpay payment response received');
+
             // Verify payment
             const verifyResponse = await api.post('/payment/verifypayment', {
-              order_id: data.order.id,
-              payment_id: response.razorpay_payment_id,
-              signature: response.razorpay_signature,
+              razorpay_order_id: data.order.id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
               subscriptionType: plan.id,
             });
 
             const verifyData = verifyResponse.data;
 
             if (verifyData.success) {
+              console.log('Payment verified successfully');
               alert('Payment successful! Your subscription is now active.');
               onClose();
-              window.location.reload(); // Refresh to update subscription status
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
             } else {
-              alert('Payment verification failed. Please contact support.');
+              const errorMsg = verifyData.message || 'Payment verification failed';
+              console.error('Verification failed:', errorMsg);
+              alert(errorMsg + ' Please contact support.');
             }
           } catch (error) {
-            console.error('Verification error:', error);
-            alert('Payment verification failed. Please contact support.');
+            console.error('Verification error:', {
+              status: error.response?.status,
+              message: error.response?.data?.message,
+              error: error.message,
+            });
+            alert(
+              error.response?.data?.message || 
+              'Payment verification failed. Please contact support.'
+            );
           } finally {
             setProcessingPlan(null);
           }
@@ -196,18 +233,28 @@ export default function PricingModal({ isOpen, onClose }) {
       };
 
       const razorpay = new window.Razorpay(options);
-      razorpay.on('payment.failed', () => {
-        alert('Payment failed. Please try again.');
+      razorpay.on('payment.failed', function(response) {
+        console.error('Razorpay payment failed:', response.error);
+        alert(`Payment failed: ${response.error.description || 'Please try again.'}`);
         setProcessingPlan(null);
       });
       razorpay.open();
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment error:', {
+        status: error.response?.status,
+        message: error.response?.data?.message,
+        error: error.message,
+      });
+
+      let errorMessage = 'Failed to process payment. Please try again.';
+
       if (error.response?.status === 401) {
-        alert('Please login to subscribe');
-      } else {
-        alert('Failed to process payment. Please try again.');
+        errorMessage = 'Please login to subscribe';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
       }
+
+      alert(errorMessage);
       setProcessingPlan(null);
     }
   };
