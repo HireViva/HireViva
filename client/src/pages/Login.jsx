@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GoogleLogin } from '@react-oauth/google';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
@@ -50,29 +49,6 @@ export default function Login() {
         } catch (error) {
             console.error('Login error:', error);
             toast.error(error.response?.data?.message || 'Login failed');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleGoogleSuccess = async (credentialResponse) => {
-        setLoading(true);
-        try {
-            const response = await api.post('/auth/google', {
-                credential: credentialResponse.credential,
-            });
-
-            if (response.data.success) {
-                toast.success(response.data.message);
-                await checkAuth();
-                const returnUrl = location.state?.returnUrl || '/';
-                navigate(returnUrl, { replace: true });
-            } else {
-                toast.error(response.data.message);
-            }
-        } catch (error) {
-            console.error('Google login error:', error);
-            toast.error('Google login failed');
         } finally {
             setLoading(false);
         }
@@ -162,29 +138,6 @@ export default function Login() {
                             )}
                         </button>
                     </form>
-
-                    {/* Divider */}
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border/50"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-card text-muted-foreground">or continue with</span>
-                        </div>
-                    </div>
-
-                    {/* Google Sign-In */}
-                    <div className="flex justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => toast.error('Google login failed')}
-                            theme="filled_black"
-                            size="large"
-                            width={320}
-                            text="signin_with"
-                            shape="rectangular"
-                        />
-                    </div>
 
                     {/* Footer */}
                     <div className="mt-6 text-center space-y-3">

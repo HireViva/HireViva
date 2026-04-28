@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { GoogleLogin } from '@react-oauth/google';
 import api from '../api';
 import { useAuth } from '../context/AuthContext';
 
@@ -52,28 +51,6 @@ export default function Signup() {
         } catch (error) {
             console.error('Registration error:', error);
             toast.error(error.response?.data?.message || 'Registration failed');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleGoogleSuccess = async (credentialResponse) => {
-        setLoading(true);
-        try {
-            const response = await api.post('/auth/google', {
-                credential: credentialResponse.credential,
-            });
-
-            if (response.data.success) {
-                toast.success(response.data.message);
-                await checkAuth();
-                navigate('/');
-            } else {
-                toast.error(response.data.message);
-            }
-        } catch (error) {
-            console.error('Google signup error:', error);
-            toast.error('Google signup failed');
         } finally {
             setLoading(false);
         }
@@ -171,29 +148,6 @@ export default function Signup() {
                             )}
                         </button>
                     </form>
-
-                    {/* Divider */}
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border/50"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-card text-muted-foreground">or sign up with</span>
-                        </div>
-                    </div>
-
-                    {/* Google Sign-Up */}
-                    <div className="flex justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={() => toast.error('Google signup failed')}
-                            theme="filled_black"
-                            size="large"
-                            width={320}
-                            text="signup_with"
-                            shape="rectangular"
-                        />
-                    </div>
 
                     {/* Footer */}
                     <div className="mt-6 text-center">

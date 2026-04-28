@@ -1,10 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { OAuth2Client } from 'google-auth-library';
 import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register controller
 export const register = async (req, res) => {
@@ -230,68 +227,5 @@ export const resetPassword = async (req, res) => {
         return res.json({ success: true, message: 'Password has been reset successfully' });
     } catch (error) {
         return res.json({ success: false, message: error.message });
-    }
-};
-
-// Google OAuth controller
-export const googleAuth = async (req, res) => {
-    const { credential } = req.body;
-
-    if (!credential) {
-        return res.json({ success: false, message: 'Google credential is required' });
-    }
-
-    try {
-        // Verify the Google ID token
-        const ticket = await googleClient.verifyIdToken({
-            idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-
-        const payload = ticket.getPayload();
-        const { sub: googleId, email, name, email_verified } = payload;
-
-        // Check if user exists with this Google ID
-        let user = await userModel.findOne({ googleId });
-
-        if (!user) {
-            // Check if user exists with this email (link accounts)
-            user = await userModel.findOne({ email });
-
-            if (user) {
-                // Link Google account to existing user
-                user.googleId = googleId;
-                user.authProvider = user.authProvider === 'local' ? 'local' : 'google';
-                if (email_verified) {
-                    user.isAccountVerified = true;
-                }
-                await user.save();
-            } else {
-                // Create new user
-                user = new userModel({
-                    name,
-                    email,
-                    googleId,
-                    authProvider: 'google',
-                    isAccountVerified: email_verified || false,
-                });
-                await user.save();
-            }
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        return res.json({ success: true, message: 'Google authentication successful' });
-    } catch (error) {
-        console.error('Google auth error:', error);
-        return res.json({ success: false, message: 'Google authentication failed' });
     }
 };
