@@ -379,52 +379,6 @@ export const bulkUpdateProgress = async (req, res) => {
         });
     }
 };
-export const saveNote = async (req, res) => {
-    try {
-        const userId = req.userId;
-        const { questionId, content } = req.body;
-
-        if (typeof questionId !== 'number' || typeof content !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid data'
-            });
-        }
-
-        let progress = await userProgressModel.findOne({ userId });
-
-        if (!progress) {
-            progress = await userProgressModel.create({
-                userId,
-                solved: [],
-                starred: [],
-                notes: new Map()
-            });
-        }
-
-        // Update note
-        progress.notes.set(questionId.toString(), {
-            content: content.trim(),
-            lastUpdated: new Date()
-        });
-
-        await progress.save();
-
-        res.json({
-            success: true,
-            note: {
-                content: content.trim(),
-                lastUpdated: new Date().toISOString()
-            }
-        });
-    } catch (error) {
-        console.error('Save note error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to save note'
-        });
-    }
-};
 
 // Delete note
 export const deleteNote = async (req, res) => {
