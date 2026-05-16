@@ -35,6 +35,7 @@ import AptitudeMockTestDashboard from "./pages/AptitudeMockTestDashboard.jsx";
 import AptitudeStartTest from "./pages/AptitudeStartTest.jsx";
 import AptitudeTest from "./pages/AptitudeTest.jsx";
 import AptitudeResult from "./pages/AptitudeResult.jsx";
+import Progress from "./pages/Progress.jsx";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/coding-sheet" element={<CodingSheet />} />
             <Route path="/communication" element={<Communication />} />
+            <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/pricing" element={<Pricing />} />

@@ -98,7 +98,6 @@ export default function PricingModal({ isOpen, onClose }) {
   const [subscription, setSubscription] = useState(null);
   const [processingPlan, setProcessingPlan] = useState(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
   useEffect(() => {

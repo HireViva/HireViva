@@ -2,15 +2,19 @@ import React from 'react';
 import './TopicCompletion.css';
 
 const TopicCompletion = ({ data = [] }) => {
-  const topics = [
-    { name: 'Data Structures & Algorithms', completion: 82 },
-    { name: 'System Design', completion: 55 },
-    { name: 'DBMS & SQL', completion: 70 },
-    { name: 'OS Concepts', completion: 48 },
-    { name: 'Verbal Communication', completion: 55 },
-    { name: 'Quant & Logical Reasoning', completion: 68 },
-    { name: 'Networks & Security', completion: 40 }
+  const fallbackTopics = [
+    { name: 'Data Structures & Algorithms', completion: 0 },
+    { name: 'Aptitude Reasoning', completion: 0 },
+    { name: 'Interview Readiness', completion: 0 },
+    { name: 'Communication', completion: 0 },
+    { name: 'Core Subjects', completion: 0 }
   ];
+  const topics = Array.isArray(data) && data.length > 0
+    ? data.map((topic) => ({
+        name: topic.topicName || 'Untitled Topic',
+        completion: Math.max(0, Math.min(100, Number(topic.completion) || 0))
+      }))
+    : fallbackTopics;
 
   return (
     <div className="topic-completion">

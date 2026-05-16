@@ -23,6 +23,13 @@
   padding: 1rem;
 }
 
+.chart-empty-state {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem 0.5rem;
+}
+
 .chart-line {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   transition: stroke-width 0.3s ease;

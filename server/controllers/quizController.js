@@ -1,6 +1,7 @@
 import Question from "../models/Question.js";
 import TestAttempt from "../models/TestAttempt.js";
 import userModel from "../models/userModel.js";
+import { recordUserActivity } from "../services/progressService.js";
 
 /* START TEST */
 export const startTest = async (req, res) => {
@@ -118,6 +119,11 @@ export const submitTest = async (req, res) => {
         attempt.isSubmitted = true;
 
         await attempt.save();
+        try {
+            await recordUserActivity(userId, 'mock_test');
+        } catch (progressError) {
+            console.error('Failed to record mock-test activity:', progressError.message);
+        }
 
         // Update user quiz statistics
         await updateUserQuizStats(userId, score, timeTaken);

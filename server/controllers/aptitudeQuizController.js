@@ -1,6 +1,7 @@
 import AptitudeQuestion from "../models/AptitudeQuestion.js";
 import AptitudeTestAttempt from "../models/AptitudeTestAttempt.js";
 import userModel from "../models/userModel.js";
+import { recordUserActivity } from "../services/progressService.js";
 
 /* START TEST */
 export const startTest = async (req, res) => {
@@ -118,6 +119,11 @@ export const submitTest = async (req, res) => {
         attempt.isSubmitted = true;
 
         await attempt.save();
+        try {
+            await recordUserActivity(userId, 'aptitude');
+        } catch (progressError) {
+            console.error('Failed to record aptitude activity:', progressError.message);
+        }
 
         // Update user aptitude quiz statistics
         await updateUserAptitudeQuizStats(userId, score, timeTaken);

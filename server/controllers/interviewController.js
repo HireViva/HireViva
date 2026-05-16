@@ -4,6 +4,7 @@
 import InterviewSession from '../models/InterviewSession.js';
 import * as groqService from '../services/groqService.js';
 import mongoose from 'mongoose';
+import { recordUserActivity } from '../services/progressService.js';
 
 // Store active conversations in memory (use Redis in production)
 const activeConversations = new Map();
@@ -52,6 +53,7 @@ const buildFallbackFeedback = (session) => {
 const startInterview = async (req, res) => {
     try {
         const { role, difficulty, duration, resumeText } = req.body;
+        const userId = req.userId;
 
         if (!role || !difficulty || !duration) {
             return res.status(400).json({ error: 'role, difficulty and duration are required' });
@@ -59,6 +61,7 @@ const startInterview = async (req, res) => {
 
         // Create new interview session
         const session = new InterviewSession({
+            userId,
             role,
             difficulty,
             duration,
@@ -125,6 +128,9 @@ const sendMessage = async (req, res) => {
         const session = await InterviewSession.findById(sessionId);
         if (!session) {
             return res.status(404).json({ error: 'Session not found' });
+        }
+        if (session.userId && session.userId.toString() !== req.userId) {
+            return res.status(403).json({ error: 'Access denied' });
         }
 
         // Add user message to conversation
@@ -214,6 +220,9 @@ const endInterview = async (req, res) => {
         if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
+        if (session.userId && session.userId.toString() !== req.userId) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
 
         let feedback;
         try {
@@ -250,6 +259,13 @@ const endInterview = async (req, res) => {
             console.error('Failed to persist interview end state, returning computed feedback:', saveError.message);
         }
 
+        // Feed completion activity into progress tracking.
+        try {
+            await recordUserActivity(session.userId || req.userId, 'ai_interview');
+        } catch (progressError) {
+            console.error('Failed to record interview activity:', progressError.message);
+        }
+
         // Clean up conversation context
         activeConversations.delete(sessionId);
 
@@ -275,6 +291,9 @@ const getInterview = async (req, res) => {
         const session = await InterviewSession.findById(id);
         if (!session) {
             return res.status(404).json({ error: 'Session not found' });
+        }
+        if (session.userId && session.userId.toString() !== req.userId) {
+            return res.status(403).json({ error: 'Access denied' });
         }
 
         res.json({

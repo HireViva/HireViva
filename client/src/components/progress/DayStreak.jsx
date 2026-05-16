@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { progressService } from '../../services/progressService';
 import './DayStreak.css';
 
-const DayStreak = () => {
-  const [streak, setStreak] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { token } = useAuth();
+const DayStreak = ({ data = null }) => {
+  const [streak, setStreak] = useState(data);
+  const [loading, setLoading] = useState(!data);
 
   useEffect(() => {
+    if (data) {
+      setStreak(data);
+      setLoading(false);
+      return;
+    }
     fetchDayStreak();
-  }, []);
+  }, [data]);
 
   const fetchDayStreak = async () => {
     try {
-      const response = await fetch('/api/progress/day-streak', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setStreak(data.data);
-      }
+      const response = await progressService.getDayStreak();
+      setStreak(response?.data || null);
     } catch (error) {
       console.error('Error fetching day streak:', error);
     } finally {
@@ -46,7 +42,7 @@ const DayStreak = () => {
           <div className="streak-label">Longest Streak</div>
         </div>
       </div>
-      <p className="reminder">Keep up your daily practice! 🔥</p>
+      <p className="reminder">Keep up your daily practice!</p>
     </div>
   );
 };

@@ -1,24 +1,7 @@
 import axios from "axios";
+import { getApiBaseUrl } from "./lib/apiConfig";
 
-// Determine API URL based on environment
-let baseURL;
-
-if (import.meta.env.VITE_API_URL) {
-  baseURL = `${import.meta.env.VITE_API_URL}/api`;
-} else if (import.meta.env.MODE === 'production') {
-  // Production fallback - use current domain
-  const protocol = window.location.protocol;
-  const host = window.location.host;
-  // If on Vercel frontend, route to backend
-  if (host.includes('vercel.app')) {
-    baseURL = `${protocol}//hireviva-api.onrender.com/api`;
-  } else {
-    baseURL = `${protocol}//${host}/api`;
-  }
-} else {
-  // Development
-  baseURL = 'http://localhost:5000/api';
-}
+const baseURL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL,

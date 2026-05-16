@@ -53,7 +53,7 @@ const menuSections = [
   {
     title: "PERFORMANCE",
     items: [
-      { icon: TrendingUp, label: "Progress", path: "#" },
+      { icon: TrendingUp, label: "Progress", path: "/progress" },
     ],
   },
 ];

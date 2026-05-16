@@ -10,42 +10,44 @@ const WeeklyPerformance = ({ data = [] }) => {
       };
     }
 
-    const weeks = data.map(w => `W${w.week}`);
-    
+    const weeks = data.map((weekEntry) => `W${weekEntry.week}`);
+
     return {
       weeks,
       datasets: [
         {
           name: 'AI Interview',
-          data: data.map(w => w.aiInterview || 0),
+          data: data.map((weekEntry) => weekEntry.aiInterview || 0),
           color: '#8b5cf6'
         },
         {
           name: 'Coding',
-          data: data.map(w => w.coding || 0),
+          data: data.map((weekEntry) => weekEntry.coding || 0),
           color: '#00ff88'
         },
         {
           name: 'Aptitude',
-          data: data.map(w => w.aptitude || 0),
+          data: data.map((weekEntry) => weekEntry.aptitude || 0),
           color: '#ff6b9d'
         },
         {
           name: 'Communication',
-          data: data.map(w => w.communication || 0),
+          data: data.map((weekEntry) => weekEntry.communication || 0),
           color: '#3b82f6'
         },
         {
           name: 'Core Subjects',
-          data: data.map(w => w.coreSubjects || 0),
+          data: data.map((weekEntry) => weekEntry.coreSubjects || 0),
           color: '#f59e0b'
         }
       ]
     };
   }, [data]);
 
+  const hasData = chartData.weeks.length > 0;
+
   const createLineChart = () => {
-    if (chartData.weeks.length === 0) return null;
+    if (!hasData) return null;
 
     const width = 400;
     const height = 200;
@@ -77,7 +79,6 @@ const WeeklyPerformance = ({ data = [] }) => {
       );
     });
 
-    // X-axis labels
     const xLabels = chartData.weeks.map((week, index) => (
       <text
         key={`x-${index}`}
@@ -91,7 +92,6 @@ const WeeklyPerformance = ({ data = [] }) => {
       </text>
     ));
 
-    // Y-axis labels
     const yLabels = [0, 25, 50, 75, 100].map((value) => (
       <text
         key={`y-${value}`}
@@ -107,7 +107,6 @@ const WeeklyPerformance = ({ data = [] }) => {
 
     return (
       <svg width="100%" height="240" viewBox={`0 0 ${width} ${height}`}>
-        {/* Grid */}
         <line
           x1={padding.left}
           y1={padding.top}
@@ -125,7 +124,6 @@ const WeeklyPerformance = ({ data = [] }) => {
           strokeWidth="1"
         />
 
-        {/* Horizontal grid lines */}
         {[0, 25, 50, 75, 100].map((value) => (
           <line
             key={`grid-${value}`}
@@ -139,10 +137,7 @@ const WeeklyPerformance = ({ data = [] }) => {
           />
         ))}
 
-        {/* Lines */}
         {lines}
-
-        {/* Labels */}
         {xLabels}
         {yLabels}
       </svg>
@@ -152,23 +147,25 @@ const WeeklyPerformance = ({ data = [] }) => {
   return (
     <div className="weekly-performance">
       <h3>Combined Weekly Performance</h3>
-      <p className="subtitle">AI Interview • Coding • Aptitude • Communication • Core Subjects</p>
+      <p className="subtitle">AI Interview | Coding | Aptitude | Communication | Core Subjects</p>
 
       <div className="chart-wrapper">
-        {createLineChart()}
+        {hasData ? createLineChart() : <p className="chart-empty-state">No weekly performance data yet.</p>}
       </div>
 
-      <div className="legend">
-        {chartData.datasets.map((dataset) => (
-          <div key={dataset.name} className="legend-item">
-            <div
-              className="legend-color"
-              style={{ backgroundColor: dataset.color }}
-            ></div>
-            <span>{dataset.name}</span>
-          </div>
-        ))}
-      </div>
+      {hasData && (
+        <div className="legend">
+          {chartData.datasets.map((dataset) => (
+            <div key={dataset.name} className="legend-item">
+              <div
+                className="legend-color"
+                style={{ backgroundColor: dataset.color }}
+              ></div>
+              <span>{dataset.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

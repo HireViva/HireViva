@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, FileText, AlertCircle, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { getApiBaseUrl } from '../../lib/apiConfig';
 import AIInterviewLayout from './AIInterviewLayout';
 import './LandingPage.css';
 
@@ -52,7 +53,7 @@ const LandingPage = () => {
         formData.append('resume', file);
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:5000/api';
+            const apiUrl = getApiBaseUrl();
             const response = await fetch(`${apiUrl}/resume/upload`, {
                 method: 'POST',
                 body: formData,

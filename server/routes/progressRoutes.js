@@ -2,9 +2,13 @@ import express from 'express';
 import {
     getUserProgress,
     getDashboard,
+    getMetrics,
+    getScores,
+    getCharts,
     getModuleBreakdown,
     getWeeklyPerformance,
     getDayStreak,
+    getAIMentorSuggestion,
     toggleSolved,
     toggleStarred,
     saveNote,
@@ -24,6 +28,11 @@ progressRouter.get('/', getUserProgress);
 // Get dashboard metrics
 progressRouter.get('/dashboard', getDashboard);
 
+// Dedicated dashboard datasets
+progressRouter.get('/metrics', getMetrics);
+progressRouter.get('/scores', getScores);
+progressRouter.get('/charts', getCharts);
+
 // Get module-wise breakdown
 progressRouter.get('/module-breakdown', getModuleBreakdown);
 
@@ -32,6 +41,9 @@ progressRouter.get('/weekly-performance', getWeeklyPerformance);
 
 // Get day streak
 progressRouter.get('/day-streak', getDayStreak);
+
+// AI mentor suggestion (Claude-powered when configured)
+progressRouter.post('/mentor-suggestion', getAIMentorSuggestion);
 
 // Toggle solved status
 progressRouter.post('/toggle-solved', toggleSolved);

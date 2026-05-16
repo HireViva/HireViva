@@ -18,11 +18,6 @@ import initCronJobs from './utils/cronJobs.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-connectDB();
-
-// Initialize cron jobs for subscription management
-initCronJobs();
-
 // Raw body parsing for Razorpay webhook signature verification
 // Must be registered BEFORE express.json() for the webhook route
 app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
@@ -33,6 +28,7 @@ app.use(cookieParser());
 // Enhanced CORS Configuration for production and development
 const allowedOrigins = [
     'http://localhost:5173',
+    'http://localhost:5174',
     'http://localhost:8080',
     'http://localhost:3000',
     'https://hireviva.vercel.app',
@@ -81,6 +77,18 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/subscription', subscriptionRouter);
 
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+        initCronJobs();
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error.message);
+        process.exit(1);
+    }
+};
+
+startServer();

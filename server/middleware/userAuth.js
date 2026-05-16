@@ -10,11 +10,11 @@ const userAuth = async (req, res, next) => {
         if (tokenDecode.id) {
             req.userId = tokenDecode.id;
         } else {
-            return res.status(401).json({ success: false, message: 'Not authorized, invalid token' });
+            return res.status(401).json({ success: false, message: 'Not authorized, invalid session' });
         }
         next();
     } catch (error) {
-        return res.status(401).json({ success: false, message: 'Authentication failed: ' + error.message });
+        return res.status(401).json({ success: false, message: 'Session expired or invalid, please login again' });
     }
 };
 
