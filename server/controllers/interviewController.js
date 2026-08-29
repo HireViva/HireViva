@@ -1,55 +1,36 @@
-// Placeholder for interview controller
-// This handles all interview-related API endpoints
-
 import InterviewSession from '../models/InterviewSession.js';
 import * as groqService from '../services/groqService.js';
 import mongoose from 'mongoose';
 import { recordUserActivity } from '../services/progressService.js';
 
-// Store active conversations in memory (use Redis in production)
+// In-memory session context store (sessionId → { systemPrompt, messages[] })
 const activeConversations = new Map();
 
-// Helper to validate ObjectId
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-const buildFallbackPrompt = (role, difficulty) => {
-    const prompts = [
-        `Let's continue with ${role}. Explain one project where you made a technical tradeoff and why.`,
-        `At ${difficulty} level, how would you approach debugging a production issue end-to-end?`,
-        `Describe a recent challenge and the concrete steps you took to solve it.`,
-        `What metrics would you track to evaluate the success of your implementation?`
-    ];
+// ── Fallback helpers ────────────────────────────────────────────────────────
+const FALLBACK_QUESTIONS = [
+    'Can you walk me through a challenging project you recently worked on?',
+    'How do you approach debugging a difficult production issue?',
+    'Describe a time you had to learn a new technology quickly. How did you handle it?',
+    'What tradeoffs did you make in your last major technical decision?'
+];
+let fallbackIdx = 0;
+const nextFallback = () => FALLBACK_QUESTIONS[fallbackIdx++ % FALLBACK_QUESTIONS.length];
 
-    return prompts[Math.floor(Math.random() * prompts.length)];
-};
-
-const buildFallbackFeedback = (session) => {
-    const turns = (session.conversation || []).filter((m) => m.speaker === 'user').length;
-    const base = Math.max(55, Math.min(82, 60 + turns * 2));
-
+const fallbackFeedback = (session) => {
+    const turns = (session.conversation || []).filter(m => m.speaker === 'user').length;
+    const score = Math.min(85, 55 + turns * 3);
     return {
-        overall: base,
-        scores: {
-            technical: Math.max(50, base - 2),
-            communication: Math.max(50, base + 2),
-            problemSolving: Math.max(50, base - 1),
-            confidence: Math.max(50, base)
-        },
-        strengths: [
-            'Stayed engaged through the interview',
-            'Provided answers with clear intent',
-            'Attempted role-relevant technical discussion'
-        ],
-        improvements: [
-            'Add deeper implementation details to each answer',
-            'Use concrete examples with measurable outcomes',
-            'Structure answers as context, approach, and tradeoffs'
-        ],
-        feedback: 'Interview ended with partial evidence of technical depth. Continue practicing concise, structured answers with more concrete implementation detail.'
+        overall: score,
+        scores: { technical: score - 2, communication: score + 2, problemSolving: score, confidence: score },
+        strengths: ['Completed the interview', 'Communicated intent clearly', 'Stayed engaged'],
+        improvements: ['Add implementation detail', 'Use concrete examples', 'Structure answers: context → action → result'],
+        feedback: 'Interview ended. Practice deeper technical explanations with measurable outcomes.'
     };
 };
 
-// POST /api/interview/start
+// ── POST /api/interview/start ───────────────────────────────────────────────
 const startInterview = async (req, res) => {
     try {
         const { role, difficulty, duration, resumeText } = req.body;
@@ -59,155 +40,103 @@ const startInterview = async (req, res) => {
             return res.status(400).json({ error: 'role, difficulty and duration are required' });
         }
 
-        // Create new interview session
+        // Persist session to DB
         const session = new InterviewSession({
-            userId,
-            role,
-            difficulty,
-            duration,
-            conversation: [],
-            status: 'active'
+            userId, role, difficulty, duration,
+            conversation: [], status: 'active'
         });
-
         await session.save();
 
-        let greeting;
-        let aiAvailable = true;
-        try {
-            // Get initial greeting from Groq
-            greeting = await groqService.startInterview(role, difficulty, duration, resumeText);
-        } catch (aiError) {
-            aiAvailable = false;
-            console.error('Groq start interview failed, using fallback greeting:', aiError.message);
-            greeting = `Hello. I am your AI interviewer for this ${difficulty} ${role} interview. Let's begin with your introduction and then move to technical questions.`;
-        }
-
-        // Store conversation context
-        // If resumeText is present, we should likely store it in the context as well if needed for future, 
-        // but it's mainly baked into the system prompt.
+        // Build & cache conversation context
         const systemPrompt = groqService.generateSystemPrompt(role, difficulty, duration, resumeText);
         activeConversations.set(session._id.toString(), {
             systemPrompt,
-            messages: [],
-            aiAvailable,
-            role,
-            difficulty
+            messages: [],   // chat history (user/assistant turns only)
         });
 
-        // Add greeting to conversation
-        session.conversation.push({
-            speaker: 'ai',
-            message: greeting,
-            timestamp: new Date()
-        });
+        // Get AI greeting
+        let greeting;
+        try {
+            greeting = await groqService.startInterview(role, difficulty, duration, resumeText);
+        } catch (err) {
+            console.error('Groq start failed:', err.message);
+            greeting = `Hello! I'm Alex, your interviewer for this ${difficulty} ${role} session. Let's start — please tell me about yourself.`;
+        }
 
+        // Save greeting to DB + in-memory history
+        session.conversation.push({ speaker: 'ai', message: greeting, timestamp: new Date() });
         await session.save();
 
-        res.json({
-            sessionId: session._id,
-            greeting
-        });
-    } catch (error) {
-        console.error('Error starting interview:', error);
-        res.status(500).json({ error: 'Failed to start interview' });
+        const ctx = activeConversations.get(session._id.toString());
+        ctx.messages.push({ role: 'assistant', content: greeting });
+
+        return res.json({ sessionId: session._id, greeting });
+    } catch (err) {
+        console.error('startInterview error:', err);
+        return res.status(500).json({ error: 'Failed to start interview' });
     }
 };
 
-// POST /api/interview/message
+// ── POST /api/interview/message ─────────────────────────────────────────────
 const sendMessage = async (req, res) => {
     try {
-        const { sessionId, message, speaker } = req.body;
+        const { sessionId, message } = req.body;
 
         if (!sessionId || !isValidId(sessionId)) {
             return res.status(400).json({ error: 'Invalid session ID' });
         }
-        if (!message || typeof message !== 'string' || !message.trim()) {
+        if (!message?.trim()) {
             return res.status(400).json({ error: 'Message is required' });
         }
 
         const session = await InterviewSession.findById(sessionId);
-        if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
-        }
-        if (session.userId && session.userId.toString() !== req.userId) {
+        if (!session) return res.status(404).json({ error: 'Session not found' });
+        if (session.userId?.toString() !== req.userId) {
             return res.status(403).json({ error: 'Access denied' });
         }
 
-        // Add user message to conversation
-        session.conversation.push({
-            speaker,
-            message,
-            timestamp: new Date()
-        });
-
-        // Get conversation context
-        let currentContext = activeConversations.get(sessionId);
-
-        if (!currentContext) {
-            console.log('Context missing, reconstructing from DB for session:', sessionId);
-            const systemPrompt = groqService.generateSystemPrompt(session.role, session.difficulty, session.duration);
-
-            // Reconstruct messages from stored conversation
-            const history = session.conversation.map(msg => ({
-                role: msg.speaker === 'ai' ? 'assistant' : 'user',
-                content: msg.message
+        // Restore context if server was restarted
+        let ctx = activeConversations.get(sessionId);
+        if (!ctx) {
+            console.log('Restoring context for session:', sessionId);
+            const systemPrompt = groqService.generateSystemPrompt(
+                session.role, session.difficulty, session.duration
+            );
+            // Build history from DB — map speaker → role
+            const messages = session.conversation.map(m => ({
+                role: m.speaker === 'ai' ? 'assistant' : 'user',
+                content: m.message
             }));
-
-            currentContext = {
-                systemPrompt,
-                messages: history,
-                aiAvailable: true,
-                role: session.role,
-                difficulty: session.difficulty
-            };
-
-            activeConversations.set(sessionId, currentContext);
+            ctx = { systemPrompt, messages };
+            activeConversations.set(sessionId, ctx);
         }
 
-        // Build message history for Groq
-        currentContext.messages.push({
-            role: 'user',
-            content: message
-        });
+        // Add user turn to in-memory + DB
+        ctx.messages.push({ role: 'user', content: message.trim() });
+        session.conversation.push({ speaker: 'user', message: message.trim(), timestamp: new Date() });
 
-        let aiResponse;
-        if (currentContext.aiAvailable === false) {
-            aiResponse = buildFallbackPrompt(currentContext.role || session.role, currentContext.difficulty || session.difficulty);
-        } else {
-            try {
-                // Get AI response
-                aiResponse = await groqService.getResponse(currentContext.messages, currentContext.systemPrompt);
-            } catch (aiError) {
-                console.error('Groq message failed, using fallback response:', aiError.message);
-                currentContext.aiAvailable = false;
-                aiResponse = buildFallbackPrompt(currentContext.role || session.role, currentContext.difficulty || session.difficulty);
-            }
+        // Get AI reply
+        let aiReply;
+        try {
+            aiReply = await groqService.getResponse(ctx.messages, ctx.systemPrompt);
+        } catch (err) {
+            console.error('Groq getResponse failed:', err.message);
+            aiReply = nextFallback();
         }
 
-        // Add AI response to conversation
-        currentContext.messages.push({
-            role: 'assistant',
-            content: aiResponse
-        });
-
-        session.conversation.push({
-            speaker: 'ai',
-            message: aiResponse,
-            timestamp: new Date()
-        });
-
+        // Add AI turn
+        ctx.messages.push({ role: 'assistant', content: aiReply });
+        session.conversation.push({ speaker: 'ai', message: aiReply, timestamp: new Date() });
         await session.save();
 
-        res.json({
-            message: aiResponse
-        });
-    } catch (error) {
-        console.error('Error sending message:', error);
-        res.status(500).json({ error: 'Failed to send message' });
+        return res.json({ message: aiReply });
+    } catch (err) {
+        console.error('sendMessage error:', err);
+        return res.status(500).json({ error: 'Failed to process message' });
     }
 };
 
-// POST /api/interview/end
+// ── POST /api/interview/end ─────────────────────────────────────────────────
 const endInterview = async (req, res) => {
     try {
         const { sessionId } = req.body;
@@ -217,27 +146,19 @@ const endInterview = async (req, res) => {
         }
 
         const session = await InterviewSession.findById(sessionId);
-        if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
-        }
-        if (session.userId && session.userId.toString() !== req.userId) {
+        if (!session) return res.status(404).json({ error: 'Session not found' });
+        if (session.userId?.toString() !== req.userId) {
             return res.status(403).json({ error: 'Access denied' });
         }
 
         let feedback;
         try {
-            // Generate feedback using Groq
-            feedback = await groqService.generateFeedback(
-                session.conversation,
-                session.role,
-                session.difficulty
-            );
-        } catch (aiError) {
-            console.error('Groq feedback failed, using fallback feedback:', aiError.message);
-            feedback = buildFallbackFeedback(session);
+            feedback = await groqService.generateFeedback(session.conversation, session.role, session.difficulty);
+        } catch (err) {
+            console.error('Groq feedback failed:', err.message);
+            feedback = fallbackFeedback(session);
         }
 
-        // Update session with scores and feedback
         session.scores = {
             overall: feedback.overall,
             technical: feedback.scores.technical,
@@ -245,58 +166,45 @@ const endInterview = async (req, res) => {
             problemSolving: feedback.scores.problemSolving,
             confidence: feedback.scores.confidence
         };
-
         session.feedback = {
             strengths: feedback.strengths,
             improvements: feedback.improvements,
             detailed: feedback.feedback
         };
-
         session.status = 'completed';
-        try {
-            await session.save();
-        } catch (saveError) {
-            console.error('Failed to persist interview end state, returning computed feedback:', saveError.message);
+
+        try { await session.save(); } catch (e) {
+            console.error('Session save error:', e.message);
         }
 
-        // Feed completion activity into progress tracking.
         try {
             await recordUserActivity(session.userId || req.userId, 'ai_interview');
-        } catch (progressError) {
-            console.error('Failed to record interview activity:', progressError.message);
+        } catch (e) {
+            console.error('Activity record error:', e.message);
         }
 
-        // Clean up conversation context
         activeConversations.delete(sessionId);
 
-        res.json({
-            sessionId: session._id,
-            ...feedback
-        });
-    } catch (error) {
-        console.error('Error ending interview:', error);
-        res.status(500).json({ error: 'Failed to end interview' });
+        return res.json({ sessionId: session._id, ...feedback });
+    } catch (err) {
+        console.error('endInterview error:', err);
+        return res.status(500).json({ error: 'Failed to end interview' });
     }
 };
 
-// GET /api/interview/:id
+// ── GET /api/interview/:id ──────────────────────────────────────────────────
 const getInterview = async (req, res) => {
     try {
         const { id } = req.params;
-
-        if (!id || !isValidId(id)) {
-            return res.status(400).json({ error: 'Invalid session ID' });
-        }
+        if (!id || !isValidId(id)) return res.status(400).json({ error: 'Invalid ID' });
 
         const session = await InterviewSession.findById(id);
-        if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
-        }
-        if (session.userId && session.userId.toString() !== req.userId) {
+        if (!session) return res.status(404).json({ error: 'Session not found' });
+        if (session.userId?.toString() !== req.userId) {
             return res.status(403).json({ error: 'Access denied' });
         }
 
-        res.json({
+        return res.json({
             overall: session.scores?.overall || 0,
             scores: {
                 technical: session.scores?.technical || 0,
@@ -311,15 +219,10 @@ const getInterview = async (req, res) => {
             difficulty: session.difficulty,
             duration: session.duration
         });
-    } catch (error) {
-        console.error('Error fetching interview:', error);
-        res.status(500).json({ error: 'Failed to fetch interview' });
+    } catch (err) {
+        console.error('getInterview error:', err);
+        return res.status(500).json({ error: 'Failed to fetch interview' });
     }
 };
 
-export {
-    startInterview,
-    sendMessage,
-    endInterview,
-    getInterview
-};
+export { startInterview, sendMessage, endInterview, getInterview };

@@ -12,17 +12,15 @@ export const useMediaDevices = () => {
         setError(null)
 
         try {
+            // Request ONLY video — SpeechRecognition manages the mic separately.
+            // Requesting audio here causes Chrome to block SpeechRecognition mic access.
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 1280 },
                     height: { ideal: 720 },
                     facingMode: 'user'
                 },
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                }
+                audio: false
             })
 
             setStream(mediaStream)

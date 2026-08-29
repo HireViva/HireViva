@@ -74,9 +74,9 @@ const App = () => (
 
             {/* AI Interview Routes */}
             <Route path="/ai-interview" element={<AIInterviewLanding />} />
-            <Route path="/ai-interview/setup" element={<InterviewSetup />} />
-            <Route path="/ai-interview/room" element={<InterviewRoom />} />
-            <Route path="/ai-interview/results/:id" element={<InterviewResults />} />
+            <Route path="/ai-interview/setup" element={<ProtectedRoute><InterviewSetup /></ProtectedRoute>} />
+            <Route path="/ai-interview/room" element={<ProtectedRoute><InterviewRoom /></ProtectedRoute>} />
+            <Route path="/ai-interview/results/:id" element={<ProtectedRoute><InterviewResults /></ProtectedRoute>} />
             {/* Aptitude Routes - Protected */}
             <Route path="/aptitude-study-material" element={<ProtectedRoute><AptitudeStudyMaterial /></ProtectedRoute>} />
             <Route path="/aptitude-mock-test" element={<ProtectedRoute><AptitudeMockTestDashboard /></ProtectedRoute>} />

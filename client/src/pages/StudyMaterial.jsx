@@ -24,7 +24,7 @@ const studyMaterials = [
         gradient: "from-purple-600 to-pink-500",
         glowColor: "rgba(168,85,247,0.15)",
         badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-        logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Tux.png/100px-Tux.png",
+        logoUrl: "https://cdn-icons-png.flaticon.com/512/6303/6303082.png",
         pdfUrl: "https://drive.google.com/file/d/1f_ORPS2ug9HPfF-P8KgS-5m4br3VTUb_/preview"
     },
     {
