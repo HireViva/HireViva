@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Clock, CheckCircle, Play, Home } from "lucide-react";
+import { Clock, CheckCircle, Play, ArrowLeft, ShieldAlert } from "lucide-react";
 import api from "../api";
+import Sidebar from "../components/Sidebar";
 
 export default function AptitudeStartTest() {
     const navigate = useNavigate();
@@ -9,11 +10,9 @@ export default function AptitudeStartTest() {
 
     const testDetails = {
         title: `Aptitude Mock Test ${testId}`,
-        description: "Master your aptitude skills with this comprehensive assessment.",
+        description: "Master your aptitude skills with this comprehensive assessment. Ensure you have a stable internet connection before starting.",
         duration: "30 Min",
         questions: "Varies",
-        color: "from-purple-400 to-pink-500",
-        iconColor: "text-purple-600"
     };
 
     const startTest = async () => {
@@ -37,68 +36,107 @@ export default function AptitudeStartTest() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col w-full">
-            {/* Header with back to home button */}
-            <header className="p-4 sm:p-6">
-                <button
-                    onClick={() => navigate("/")}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors group"
-                >
-                    <Home className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-medium">Back to Home</span>
-                </button>
-            </header>
+        <div className="min-h-screen bg-background flex w-full relative overflow-hidden font-sans">
+            <Sidebar />
+            
+            <main className="flex-1 flex flex-col overflow-auto relative z-10 lg:ml-64">
+                {/* Immersive Background Glows */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[150px]" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-pink-500/10 blur-[150px]" />
+                </div>
 
-            <main className="flex-1 p-6 md:p-12 flex flex-col items-center justify-center">
-                <div className="max-w-4xl w-full">
-                    <div className="mb-12 text-center md:text-left">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                            Start Aptitude Quiz
-                        </h1>
-                        <p className="text-xl text-gray-600 max-w-2xl">
-                            You are about to start {testDetails.title}. Good luck!
-                        </p>
-                    </div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all border border-gray-100 flex flex-col max-w-2xl mx-auto"
+                {/* Header */}
+                <header className="relative z-20 px-6 py-6 sm:px-12 flex justify-between items-center shrink-0">
+                    <button
+                        onClick={() => navigate('/aptitude-mock-test')}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card/50 border border-border/50 hover:bg-muted/80 text-sm text-muted-foreground transition-all group"
                     >
-                        <div className={`bg-gradient-to-r ${testDetails.color} p-8 text-white relative overflow-hidden h-40 flex flex-col justify-center`}>
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
-                            <h2 className="text-3xl font-bold relative z-10">{testDetails.title}</h2>
-                            <p className="opacity-90 relative z-10 text-sm font-medium mt-1">{testDetails.description}</p>
+                        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                        Back to Aptitude Tests
+                    </button>
+                </header>
+
+                <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-12 relative z-10 min-h-0">
+                    <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8 lg:gap-16 items-center lg:items-stretch">
+                        
+                        {/* Left Column: Text & Info */}
+                        <div className="flex-1 flex flex-col justify-center text-center lg:text-left">
+                            <motion.div 
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 w-fit mx-auto lg:mx-0 mb-4"
+                            >
+                                <ShieldAlert size={14} />
+                                <span className="text-xs font-bold uppercase tracking-wider">Proctored Environment</span>
+                            </motion.div>
+                            
+                            <motion.h1 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground mb-4 tracking-tight leading-tight"
+                            >
+                                Ready to <br className="hidden lg:block"/>
+                                <span className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 bg-clip-text text-transparent">Challenge Yourself?</span>
+                            </motion.h1>
+                            
+                            <motion.p 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-base sm:text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0"
+                            >
+                                {testDetails.description}
+                            </motion.p>
                         </div>
 
-                        <div className="p-8 flex-1 flex flex-col">
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center">
-                                    <Clock className={`w-6 h-6 mb-2 ${testDetails.iconColor}`} />
-                                    <span className="text-gray-500 text-xs uppercase font-bold tracking-wider">Time</span>
-                                    <span className="text-lg font-bold text-gray-800">{testDetails.duration}</span>
+                        {/* Right Column: The Start Card */}
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex-1 w-full max-w-md mx-auto lg:max-w-none flex flex-col"
+                        >
+                            <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col h-full relative group">
+                                
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                
+                                {/* Card Header */}
+                                <div className="p-8 border-b border-border/30 relative overflow-hidden bg-background/50">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-[50px] transform translate-x-10 -translate-y-10"></div>
+                                    <h2 className="text-2xl font-bold text-foreground relative z-10">{testDetails.title}</h2>
+                                    <p className="text-sm text-muted-foreground mt-1 relative z-10">Standard Assessment Protocol</p>
                                 </div>
-                                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center">
-                                    <CheckCircle className={`w-6 h-6 mb-2 ${testDetails.iconColor}`} />
-                                    <span className="text-gray-500 text-xs uppercase font-bold tracking-wider">Qs</span>
-                                    <span className="text-lg font-bold text-gray-800">{testDetails.questions}</span>
-                                </div>
-                            </div>
 
-                            <div className="mt-auto">
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={startTest}
-                                    className={`w-full bg-gradient-to-r ${testDetails.color} text-white font-bold py-4 rounded-xl shadow-lg transition-transform flex items-center justify-center space-x-2 group`}
-                                >
-                                    <span className="text-lg">Start Test</span>
-                                    <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
+                                {/* Card Body */}
+                                <div className="p-8 flex-1 flex flex-col">
+                                    <div className="grid grid-cols-2 gap-4 mb-8">
+                                        <div className="bg-background/80 p-5 rounded-2xl border border-border/50 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-purple-500/30 transition-colors">
+                                            <Clock className="w-6 h-6 mb-2 text-purple-400" />
+                                            <span className="text-muted-foreground text-xs uppercase font-bold tracking-wider mb-1">Time Limit</span>
+                                            <span className="text-xl font-bold text-foreground">{testDetails.duration}</span>
+                                        </div>
+                                        <div className="bg-background/80 p-5 rounded-2xl border border-border/50 flex flex-col items-center justify-center text-center shadow-inner group-hover:border-pink-500/30 transition-colors">
+                                            <CheckCircle className="w-6 h-6 mb-2 text-pink-400" />
+                                            <span className="text-muted-foreground text-xs uppercase font-bold tracking-wider mb-1">Questions</span>
+                                            <span className="text-xl font-bold text-foreground">{testDetails.questions}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-auto">
+                                        <button
+                                            onClick={startTest}
+                                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all flex items-center justify-center gap-3 group/btn"
+                                        >
+                                            <span className="text-base tracking-wide">Enter Test Environment</span>
+                                            <Play size={18} className="group-hover/btn:translate-x-1 transition-transform fill-current" />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </div>
                 </div>
             </main>
         </div>

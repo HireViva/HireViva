@@ -56,6 +56,7 @@ const LandingPage = () => {
             const apiUrl = getApiBaseUrl();
             const response = await fetch(`${apiUrl}/resume/upload`, {
                 method: 'POST',
+                credentials: 'include',
                 body: formData,
             });
 

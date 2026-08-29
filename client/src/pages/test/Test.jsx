@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Bookmark, ChevronLeft, ChevronRight } from "lucide-react"; // Replaced Icons
 import { clsx } from "clsx";
 import Timer from "../../components/Timer";
@@ -199,135 +199,122 @@ export default function Test() {
     const isBookmarked = bookmarks.has(currentQ._id);
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-            <main className="flex-1 flex flex-col">
-                {/* Header */}
-                <header className="bg-white shadow-md sticky top-0 z-30 px-6 py-4">
-                    <div className="max-w-7xl mx-auto flex items-center justify-between">
-                        <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent hidden sm:block tracking-tight">
-                            Quiz Challenge
-                        </h1>
+        <div className="h-screen max-h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
+            {/* Header */}
+            <header className="bg-white shadow-sm border-b border-gray-200 shrink-0 px-6 py-2.5 z-30">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+                        Quiz Challenge
+                    </h1>
+                    <div className="flex items-center gap-4">
                         <Timer endTime={endTime} onTimeUp={handleTimeUp} />
-
                         <button
                             onClick={submitTest}
-                            className="sm:hidden bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-colors"
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-sm transition-colors cursor-pointer"
                         >
-                            Submit
+                            End Test
                         </button>
                     </div>
-                </header>
+                </div>
+            </header>
 
-                <div className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
-
-                    {/* Main Content: Question Area */}
-                    <div className="lg:col-span-3 flex flex-col">
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6 flex justify-between items-center">
-                            <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-                                Question <span className="text-indigo-600 text-2xl md:text-3xl">{currentQIndex + 1}</span>
-                                <span className="text-gray-400 text-lg md:text-xl font-normal ml-2">/ {questions.length}</span>
-                            </h2>
-                            <button
-                                onClick={() => toggleBookmark(currentQ._id)}
-                                className={clsx(
-                                    "flex items-center space-x-3 px-5 py-3 rounded-xl font-bold transition-all transform active:scale-95",
-                                    isBookmarked ? "bg-yellow-100 text-yellow-700 ring-2 ring-yellow-200" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                )}
-                            >
-                                {isBookmarked ? <Bookmark className="w-5 h-5 fill-current" /> : <Bookmark className="w-5 h-5" />}
-                                <span className="hidden md:inline">{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
-                            </button>
-                        </div>
-
-                        <div className="flex-1 relative min-h-[400px]">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={currentQ._id}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.25 }}
-                                    className="h-full"
-                                >
-                                    <QuestionCard
-                                        questionIndex={currentQIndex}
-                                        q={currentQ}
-                                        selected={answers[currentQ._id]}
-                                        onSelect={(op) => saveAnswer(currentQ._id, op)}
-                                    />
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-
-                        {/* Navigation Buttons */}
-                        <div className="flex justify-between items-center mt-8 bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100 sticky bottom-4 z-20">
-                            <button
-                                onClick={handlePrev}
-                                disabled={currentQIndex === 0}
-                                className="flex items-center space-x-3 px-8 py-4 rounded-2xl font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition text-lg"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                                <span className="hidden md:inline">Previous</span>
-                            </button>
-
-                            {isLastQuestion ? (
-                                <button
-                                    onClick={submitTest}
-                                    className="flex items-center space-x-3 px-10 py-4 rounded-2xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1 text-lg"
-                                >
-                                    <span>Submit Test</span>
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleNext}
-                                    className="flex items-center space-x-3 px-10 py-4 rounded-2xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1 text-lg"
-                                >
-                                    <span className="hidden md:inline">Next</span>
-                                    <span>Question</span>
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
+            <main className="flex-1 min-h-0 max-w-7xl mx-auto w-full p-4 grid grid-cols-1 lg:grid-cols-4 gap-4 overflow-hidden">
+                {/* Main Content: Question Area */}
+                <div className="lg:col-span-3 flex flex-col min-h-0 h-full">
+                    {/* Top bar with question counter & bookmark */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-2.5 mb-2.5 shrink-0 flex justify-between items-center">
+                        <h2 className="text-base sm:text-lg font-bold text-gray-800 flex items-center">
+                            Question <span className="text-indigo-600 ml-1.5">{currentQIndex + 1}</span>
+                            <span className="text-gray-400 text-sm sm:text-base font-normal ml-1.5">/ {questions.length}</span>
+                        </h2>
+                        <button
+                            onClick={() => toggleBookmark(currentQ._id)}
+                            className={clsx(
+                                "flex items-center gap-2 px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold transition-all transform active:scale-95",
+                                isBookmarked ? "bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200" : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
                             )}
-                        </div>
+                        >
+                            {isBookmarked ? <Bookmark className="w-3.5 h-3.5 fill-current" /> : <Bookmark className="w-3.5 h-3.5" />}
+                            <span>{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
+                        </button>
                     </div>
 
-                    {/* Question Palette */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-24">
-                            <h3 className="font-bold text-gray-800 mb-6 text-lg border-b pb-4">Question Overview</h3>
-                            <div className="grid grid-cols-5 gap-3">
-                                {questions.map((q, idx) => {
-                                    const isAnswered = answers[q._id] !== undefined;
-                                    const isMarked = bookmarks.has(q._id);
-                                    const isCurrent = currentQIndex === idx;
-
-                                    let bgClass = "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"; // Default
-                                    if (isMarked) bgClass = "bg-yellow-100 text-yellow-700 border-yellow-300 ring-2 ring-yellow-100";
-                                    else if (isAnswered) bgClass = "bg-green-100 text-green-700 border-green-300";
-
-                                    return (
-                                        <button
-                                            key={q._id}
-                                            onClick={() => jumpToQuestion(idx)}
-                                            className={clsx(
-                                                "w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold border-2 transition-all duration-200",
-                                                bgClass,
-                                                isCurrent ? "ring-4 ring-indigo-200 border-indigo-600 z-10 scale-110 shadow-lg" : ""
-                                            )}
-                                        >
-                                            {idx + 1}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="mt-8 space-y-3 text-sm font-medium text-gray-600 bg-gray-50 p-4 rounded-xl">
-                                <div className="flex items-center"><div className="w-4 h-4 bg-green-100 border-2 border-green-300 rounded mr-3" /> Answered</div>
-                                <div className="flex items-center"><div className="w-4 h-4 bg-yellow-100 border-2 border-yellow-300 rounded mr-3" /> Bookmarked</div>
-                                <div className="flex items-center"><div className="w-4 h-4 bg-gray-100 border-2 border-gray-300 rounded mr-3" /> Not Visited</div>
-                            </div>
-                        </div>
+                    {/* Question Card View */}
+                    <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+                        <QuestionCard
+                            key={currentQ._id}
+                            questionIndex={currentQIndex}
+                            q={currentQ}
+                            selected={answers[currentQ._id]}
+                            onSelect={(op) => saveAnswer(currentQ._id, op)}
+                        />
                     </div>
 
+                    {/* Navigation Buttons */}
+                    <div className="flex justify-between items-center mt-2.5 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 shrink-0">
+                        <button
+                            onClick={handlePrev}
+                            disabled={currentQIndex === 0}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition text-xs sm:text-sm"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            <span>Previous</span>
+                        </button>
+
+                        {isLastQuestion ? (
+                            <button
+                                onClick={submitTest}
+                                className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition transform hover:-translate-y-0.5 text-xs sm:text-sm"
+                            >
+                                <span>Submit Test</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleNext}
+                                className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition transform hover:-translate-y-0.5 text-xs sm:text-sm"
+                            >
+                                <span>Next Question</span>
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Question Palette / Overview */}
+                <div className="lg:col-span-1 flex flex-col min-h-0 h-full bg-white rounded-xl shadow-sm border border-gray-200 p-3.5">
+                    <h3 className="font-semibold text-gray-800 text-xs uppercase tracking-wider mb-2 shrink-0">Overview</h3>
+                    
+                    <div className="flex-1 min-h-0 overflow-y-auto pr-1 grid grid-cols-5 gap-1.5 content-start">
+                        {questions.map((q, idx) => {
+                            const isAnswered = answers[q._id] !== undefined;
+                            const isMarked = bookmarks.has(q._id);
+                            const isCurrent = currentQIndex === idx;
+
+                            let bgClass = "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100";
+                            if (isMarked) bgClass = "bg-yellow-50 text-yellow-700 border-yellow-300";
+                            else if (isAnswered) bgClass = "bg-green-50 text-green-700 border-green-300";
+
+                            return (
+                                <button
+                                    key={q._id}
+                                    onClick={() => jumpToQuestion(idx)}
+                                    className={clsx(
+                                        "w-full aspect-square rounded-lg flex items-center justify-center text-xs font-bold border transition-all duration-200",
+                                        bgClass,
+                                        isCurrent ? "ring-2 ring-indigo-200 border-indigo-600 z-10 scale-105 shadow-sm" : ""
+                                    )}
+                                >
+                                    {idx + 1}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-2 pt-2 border-t border-gray-100 space-y-1.5 text-xs font-medium text-gray-600 bg-gray-50/80 p-2.5 rounded-lg shrink-0">
+                        <div className="flex items-center"><div className="w-2.5 h-2.5 bg-green-50 border border-green-300 rounded-sm mr-2" /> Answered</div>
+                        <div className="flex items-center"><div className="w-2.5 h-2.5 bg-yellow-50 border border-yellow-300 rounded-sm mr-2" /> Bookmarked</div>
+                        <div className="flex items-center"><div className="w-2.5 h-2.5 bg-gray-50 border border-gray-300 rounded-sm mr-2" /> Not Visited</div>
+                    </div>
                 </div>
             </main>
         </div>

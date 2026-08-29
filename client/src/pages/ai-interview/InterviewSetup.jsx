@@ -45,9 +45,13 @@ const InterviewSetup = () => {
             return
         }
 
-        if (!hasPermission) {
-            await requestPermissions()
-        } else {
+        let permitted = hasPermission
+        if (!permitted) {
+            const stream = await requestPermissions()
+            permitted = !!stream
+        }
+
+        if (permitted) {
             navigate('/ai-interview/room', {
                 state: {
                     ...config,
