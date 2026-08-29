@@ -123,19 +123,36 @@ export const register = async (req, res) => {
 
         // Send Welcome Email
         try {
-
             await sendEmail({
                 to: email,
-                subject: 'Welcome to HireViva',
+                subject: '🎉 Welcome to HireViva — Your AI Interview Journey Starts Now!',
                 html: `
-                    <h1>Welcome to HireViva</h1>
-                    <p>Hello ${name},</p>
-                    <p>Your account has been created successfully.</p>
-                `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0f0f1a;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:10px;">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;display:inline-block;"></div>
+        <span style="font-size:26px;font-weight:800;color:#fff;">HireViva</span>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,#1e1b4b,#1e1e2e);border:1px solid #312e81;border-radius:20px;padding:40px;">
+      <h1 style="color:#fff;font-size:28px;font-weight:700;margin:0 0 8px;">Welcome aboard, ${name}! 🚀</h1>
+      <p style="color:#a5b4fc;font-size:16px;margin:0 0 28px;">Your account is ready. Let's ace those interviews.</p>
+      <div style="background:#0f0f1a;border-radius:12px;padding:24px;margin-bottom:24px;">
+        <p style="color:#e2e8f0;margin:0 0 12px;font-size:15px;">With HireViva you can:</p>
+        <div style="color:#a5b4fc;font-size:14px;line-height:2;">✅ &nbsp;Practice with AI Interviews<br>✅ &nbsp;Take Aptitude &amp; Mock Tests<br>✅ &nbsp;Track your Progress<br>✅ &nbsp;Improve with detailed Feedback</div>
+      </div>
+      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" style="display:block;text-align:center;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:700;font-size:16px;">Start Practising Now →</a>
+    </div>
+    <p style="text-align:center;color:#4b5563;font-size:13px;margin-top:24px;">© ${new Date().getFullYear()} HireViva. All rights reserved.</p>
+  </div>
+</body>
+</html>`
             });
-
         } catch (emailError) {
-            console.error(emailError);
+            console.error('Welcome email failed:', emailError.message);
         }
 
         return res.json({
@@ -204,6 +221,43 @@ export const login = async (req, res) => {
             token,
             cookieOptions
         );
+
+        // Send login notification email (non-blocking)
+        try {
+            const loginTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+            sendEmail({
+                to: user.email,
+                subject: '🔐 New Login to Your HireViva Account',
+                html: `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#0f0f1a;font-family:'Segoe UI',Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:10px;">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;display:inline-block;"></div>
+        <span style="font-size:26px;font-weight:800;color:#fff;">HireViva</span>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,#1e1b4b,#1e1e2e);border:1px solid #312e81;border-radius:20px;padding:40px;">
+      <h2 style="color:#fff;font-size:22px;margin:0 0 8px;">New login detected 🔐</h2>
+      <p style="color:#a5b4fc;margin:0 0 28px;">Hi ${user.name}, someone just signed into your HireViva account.</p>
+      <div style="background:#0f0f1a;border-radius:12px;padding:20px;margin-bottom:24px;">
+        <table style="width:100%;color:#e2e8f0;font-size:14px;">
+          <tr><td style="padding:8px 0;color:#6b7280;">Time</td><td style="text-align:right;">${loginTime} IST</td></tr>
+          <tr><td style="padding:8px 0;color:#6b7280;">Account</td><td style="text-align:right;">${user.email}</td></tr>
+        </table>
+      </div>
+      <p style="color:#f87171;font-size:14px;margin:0;">If this wasn't you, please reset your password immediately.</p>
+    </div>
+    <p style="text-align:center;color:#4b5563;font-size:13px;margin-top:24px;">© ${new Date().getFullYear()} HireViva. All rights reserved.</p>
+  </div>
+</body>
+</html>`
+            }).catch(e => console.error('Login email failed:', e.message));
+        } catch (emailError) {
+            console.error('Login email failed:', emailError.message);
+        }
 
         return res.json({
             success: true,

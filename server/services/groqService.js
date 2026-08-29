@@ -1,7 +1,7 @@
 import Groq from 'groq-sdk';
 
-const PRIMARY_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
-const FALLBACK_MODEL = 'llama-3.1-8b-instant';
+const PRIMARY_MODEL = 'groq/compound';
+const FALLBACK_MODEL = 'groq/compound'; // Same — only this model works on current API key
 
 // Lazily get or create Groq client
 const getGroqClient = () => {
