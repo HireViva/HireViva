@@ -1,0 +1,219 @@
+.interview-setup {
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.setup-container {
+    max-width: 800px;
+    width: 100%;
+}
+
+.setup-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.logo-icon {
+    font-size: 48px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.logo h1 {
+    font-size: 42px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.tagline {
+    font-size: 18px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.setup-card {
+    padding: 40px;
+    margin-bottom: 32px;
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    color: var(--text-primary);
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.duration-options,
+.difficulty-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.duration-btn,
+.difficulty-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 24px;
+    border: 2px solid var(--border);
+    background: rgba(15, 23, 42, 0.4);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.duration-btn:hover,
+.difficulty-btn:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.duration-btn.active,
+.difficulty-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.difficulty-btn.easy.active {
+    background: linear-gradient(135deg, var(--success), #34d399);
+    border-color: var(--success);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+}
+
+.difficulty-btn.hard.active {
+    background: linear-gradient(135deg, var(--danger), #f87171);
+    border-color: var(--danger);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+}
+
+.permissions-section {
+    margin: 32px 0;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.permissions-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+.permissions-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.permission-granted {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.status-icon {
+    font-size: 24px;
+}
+
+.permission-pending {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+}
+
+.error-message {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    color: var(--danger);
+    font-size: 14px;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    margin-top: 8px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.feature-card {
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px var(--shadow);
+}
+
+.feature-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.feature-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 32px;
+    }
+
+    .setup-card {
+        padding: 24px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}

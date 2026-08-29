@@ -1,0 +1,70 @@
+.day-streak {
+  width: 100%;
+}
+
+.day-streak h3 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.streak-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.current-streak,
+.longest-streak {
+  text-align: center;
+}
+
+.streak-number {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.25rem;
+}
+
+.streak-label {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.separator {
+  color: #404050;
+  font-size: 1.5rem;
+}
+
+.reminder {
+  text-align: center;
+  color: #00ff88;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.day-streak.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  color: #a0a0a0;
+}
+
+@media (max-width: 480px) {
+  .streak-display {
+    gap: 0.5rem;
+  }
+
+  .separator {
+    font-size: 1.2rem;
+  }
+}

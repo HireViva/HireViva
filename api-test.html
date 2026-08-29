@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .test-section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #0f3460;
+            color: #fff;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #0f3460;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Auth API Diagnostic Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Server Connection</h2>
+        <button onclick="testServer()">Test Server</button>
+        <div id="serverResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Registration</h2>
+        <input type="text" id="regName" placeholder="Name" value="Test User">
+        <input type="email" id="regEmail" placeholder="Email" value="test@example.com">
+        <input type="password" id="regPassword" placeholder="Password" value="password123">
+        <button onclick="testRegister()">Test Register</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@example.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="password123">
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Frontend URL Test</h2>
+        <p>Frontend should be at: <a href="http://localhost:5173/login" target="_blank" style="color: #667eea;">http://localhost:5173/login</a></p>
+        <p>Click the link above to open the actual login page and check browser console (F12)</p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        async function testServer() {
+            const result = document.getElementById('serverResult');
+            result.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('http://localhost:3000');
+                const text = await response.text();
+                result.innerHTML = `<span class="success">✓ Server is running!</span><br>Response: ${text}`;
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Server connection failed!</span><br>Error: ${error.message}`;
+            }
+        }
+
+        async function testRegister() {
+            const result = document.getElementById('registerResult');
+            result.innerHTML = 'Testing...';
+            
+            const data = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const json = await response.json();
+                
+                if (json.success) {
+                    result.innerHTML = `<span class="success">✓ Registration successful!</span><br>${JSON.stringify(json, null, 2)}`;
+                } else {
+                    result.innerHTML = `<span class="error">✗ Registration failed</span><br>${JSON.stringify(json, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Request failed!</span><br>Error: ${error.message}<br>Make sure CORS is enabled on the server.`;
+            }
+        }
+
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            result.innerHTML = 'Testing...';
+            
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const json = await response.json();
+                
+                if (json.success) {
+                    result.innerHTML = `<span class="success">✓ Login successful!</span><br>${JSON.stringify(json, null, 2)}`;
+                } else {
+                    result.innerHTML = `<span class="error">✗ Login failed</span><br>${JSON.stringify(json, null, 2)}`;
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Request failed!</span><br>Error: ${error.message}<br>Check if server is running and CORS is enabled.`;
+            }
+        }
+
+        // Auto-test server on load
+        window.onload = () => {
+            testServer();
+        };
+    </script>
+</body>
+</html>

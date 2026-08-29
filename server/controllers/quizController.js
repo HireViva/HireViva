@@ -1,0 +1,380 @@
+import Question from "../models/Question.js";
+import TestAttempt from "../models/TestAttempt.js";
+import userModel from "../models/userModel.js";
+import { recordUserActivity } from "../services/progressService.js";
+
+/* START TEST */
+export const startTest = async (req, res) => {
+    // req.userId comes from auth middleware
+    const userId = req.userId;
+    const { testId } = req.body; // testId passed from frontend, maps to testSet
+
+    console.log(`Starting test for user ${userId}, testSet: ${testId}`);
+
+    try {
+        const attempt = await TestAttempt.create({
+            userId,
+            testSet: testId || 1, // Default to 1 if not provided
+            startTime: new Date(),
+            endTime: new Date(Date.now() + 30 * 60 * 1000), // 60 min
+            answers: {}
+        });
+
+        res.json({
+            attemptId: attempt._id,
+            endTime: attempt.endTime
+        });
+    } catch (error) {
+        console.error("Error in startTest:", error);
+        res.status(500).json({ message: "Failed to start test", error: error.message });
+    }
+};
+
+/* GET QUESTIONS */
+export const getQuestions = async (req, res) => {
+    try {
+        // Optionally filter by testSet if passed in query
+        const { testSet } = req.query;
+        const query = testSet ? { testSet } : {};
+
+        const questions = await Question.find(query).select("-correctAnswer");
+        res.json(questions);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch questions", error: error.message });
+    }
+};
+
+/* SAVE ANSWER */
+export const saveAnswer = async (req, res) => {
+    const { attemptId, questionId, selectedOption } = req.body;
+
+    try {
+        await TestAttempt.findByIdAndUpdate(attemptId, {
+            $set: {
+                [`answers.${questionId}`]: selectedOption
+            }
+        });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to save answer", error: error.message });
+    }
+};
+
+/* SUBMIT TEST */
+export const submitTest = async (req, res) => {
+    const { attemptId } = req.body;
+    const userId = req.userId;
+
+    if (!attemptId) {
+        return res.status(400).json({ message: "attemptId is required" });
+    }
+
+    try {
+        const attempt = await TestAttempt.findById(attemptId);
+
+        if (!attempt) {
+            return res.status(404).json({ message: "Test attempt not found" });
+        }
+
+        // 🔒 Prevent double submission
+        if (attempt.isSubmitted) {
+            return res.status(400).json({ message: "Test already submitted" });
+        }
+
+        // Calculate time taken in seconds
+        const timeTaken = Math.floor((new Date() - new Date(attempt.startTime)) / 1000);
+
+        // Fetch questions for this test set
+        const questions = await Question.find({ testSet: attempt.testSet });
+        let score = 0;
+        let correctAnswers = 0;
+
+        questions.forEach(q => {
+            const selected = attempt.answers?.get(q._id.toString());
+            if (selected === q.correctAnswer) {
+                score += q.marks;
+                correctAnswers++;
+            }
+        });
+
+        const totalQuestions = questions.length;
+        const incorrectAnswers = totalQuestions - correctAnswers;
+        const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+
+        // Get attempt number for this user and test set
+        const previousAttempts = await TestAttempt.countDocuments({
+            userId: attempt.userId,
+            testSet: attempt.testSet,
+            isSubmitted: true
+        });
+
+        // Update attempt with all calculated values
+        attempt.score = score;
+        attempt.correctAnswers = correctAnswers;
+        attempt.incorrectAnswers = incorrectAnswers;
+        attempt.totalQuestions = totalQuestions;
+        attempt.timeTaken = timeTaken;
+        attempt.percentage = percentage;
+        attempt.attemptNumber = previousAttempts + 1;
+        attempt.isSubmitted = true;
+
+        await attempt.save();
+        try {
+            await recordUserActivity(userId, 'mock_test');
+        } catch (progressError) {
+            console.error('Failed to record mock-test activity:', progressError.message);
+        }
+
+        // Update user quiz statistics
+        await updateUserQuizStats(userId, score, timeTaken);
+
+        res.json({
+            score,
+            totalQuestions,
+            correctAnswers,
+            incorrectAnswers,
+            percentage,
+            timeTaken
+        });
+    } catch (error) {
+        console.error("Error submitting test:", error);
+        res.status(500).json({ message: "Failed to submit test", error: error.message });
+    }
+};
+
+/* Helper function to update user quiz statistics */
+async function updateUserQuizStats(userId, score, timeTaken) {
+    try {
+        const user = await userModel.findById(userId);
+
+        if (!user) return;
+
+        // Initialize quizStats if it doesn't exist (for existing users)
+        if (!user.quizStats) {
+            user.quizStats = {
+                totalAttempts: 0,
+                totalCompleted: 0,
+                averageScore: 0,
+                bestScore: 0,
+                totalTimeSpent: 0,
+                lastAttemptDate: null
+            };
+        }
+
+        // Update basic stats
+        user.quizStats.totalAttempts += 1;
+        user.quizStats.totalCompleted += 1;
+        user.quizStats.totalTimeSpent += Math.floor(timeTaken / 30); // convert to minutes
+        user.quizStats.lastAttemptDate = new Date();
+
+        // Update best score
+        if (score > user.quizStats.bestScore) {
+            user.quizStats.bestScore = score;
+        }
+
+        // Recalculate average score from all completed attempts
+        const allAttempts = await TestAttempt.find({
+            userId,
+            isSubmitted: true
+        });
+
+        if (allAttempts.length > 0) {
+            const totalScore = allAttempts.reduce((sum, attempt) => sum + (attempt.score || 0), 0);
+            user.quizStats.averageScore = Math.round((totalScore / allAttempts.length) * 10) / 10; // Round to 1 decimal
+        }
+
+        await user.save();
+    } catch (error) {
+        console.error("Error updating user quiz stats:", error);
+    }
+}
+
+/* GET USER QUIZ HISTORY */
+export const getUserQuizHistory = async (req, res) => {
+    const userId = req.userId;
+    const { testSet, limit = 10, page = 1 } = req.query;
+
+    try {
+        const query = {
+            userId,
+            isSubmitted: true
+        };
+
+        if (testSet) {
+            query.testSet = parseInt(testSet);
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const attempts = await TestAttempt.find(query)
+            .sort({ createdAt: -1 })
+            .limit(parseInt(limit))
+            .skip(skip)
+            .select('-answers'); // Don't send answers in history
+
+        const total = await TestAttempt.countDocuments(query);
+
+        res.json({
+            success: true,
+            attempts,
+            pagination: {
+                total,
+                page: parseInt(page),
+                pages: Math.ceil(total / parseInt(limit))
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch quiz history", error: error.message });
+    }
+};
+
+/* GET USER QUIZ STATISTICS */
+export const getUserQuizStats = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Get breakdown by test set
+        const attempts = await TestAttempt.find({
+            userId,
+            isSubmitted: true
+        });
+
+        const byTestSet = {};
+
+        attempts.forEach(attempt => {
+            const testSet = attempt.testSet;
+            if (!byTestSet[testSet]) {
+                byTestSet[testSet] = {
+                    attempts: 0,
+                    totalScore: 0,
+                    bestScore: 0
+                };
+            }
+
+            byTestSet[testSet].attempts += 1;
+            byTestSet[testSet].totalScore += attempt.score || 0;
+
+            if ((attempt.score || 0) > byTestSet[testSet].bestScore) {
+                byTestSet[testSet].bestScore = attempt.score || 0;
+            }
+        });
+
+        // Calculate average for each test set
+        Object.keys(byTestSet).forEach(testSet => {
+            const data = byTestSet[testSet];
+            data.avgScore = Math.round((data.totalScore / data.attempts) * 10) / 10;
+            delete data.totalScore; // Remove intermediate calculation
+        });
+
+        res.json({
+            success: true,
+            stats: user.quizStats,
+            byTestSet
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch quiz stats", error: error.message });
+    }
+};
+
+/* GET USER'S LATEST ATTEMPT FOR EACH TEST (for dashboard display) */
+export const getUserTestAttempts = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        // Get all submitted attempts for this user
+        const attempts = await TestAttempt.find({
+            userId,
+            isSubmitted: true
+        }).sort({ createdAt: -1 });
+
+        // Get the latest attempt for each testSet
+        const latestAttempts = {};
+        attempts.forEach(attempt => {
+            const testSet = attempt.testSet;
+            if (!latestAttempts[testSet]) {
+                latestAttempts[testSet] = {
+                    attemptId: attempt._id,
+                    testId: testSet,
+                    score: attempt.score,
+                    percentage: attempt.percentage,
+                    correctAnswers: attempt.correctAnswers,
+                    totalQuestions: attempt.totalQuestions,
+                    incorrectAnswers: attempt.incorrectAnswers,
+                    timeTaken: attempt.timeTaken,
+                    completedAt: attempt.createdAt,
+                    attemptNumber: attempt.attemptNumber
+                };
+            }
+        });
+
+        res.json({
+            success: true,
+            attempts: latestAttempts
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch user attempts", error: error.message });
+    }
+};
+
+/* GET DETAILED ATTEMPT RESULTS WITH CORRECT ANSWERS */
+export const getAttemptDetails = async (req, res) => {
+    const userId = req.userId;
+    const { attemptId } = req.params;
+
+    try {
+        const attempt = await TestAttempt.findById(attemptId);
+
+        if (!attempt) {
+            return res.status(404).json({ message: "Attempt not found" });
+        }
+
+        // Ensure user owns this attempt
+        if (attempt.userId.toString() !== userId) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
+        // Get questions for this test set with correct answers
+        const questions = await Question.find({ testSet: attempt.testSet });
+
+        // Build detailed results
+        const questionResults = questions.map(q => {
+            const userAnswer = attempt.answers?.get(q._id.toString());
+            const isCorrect = userAnswer === q.correctAnswer;
+
+            return {
+                questionId: q._id,
+                questionText: q.question,
+                options: q.options,
+                userAnswer: userAnswer !== undefined ? userAnswer : null,
+                correctAnswer: q.correctAnswer,
+                isCorrect,
+                marks: q.marks
+            };
+        });
+
+        res.json({
+            success: true,
+            attempt: {
+                id: attempt._id,
+                testSet: attempt.testSet,
+                score: attempt.score,
+                percentage: attempt.percentage,
+                correctAnswers: attempt.correctAnswers,
+                incorrectAnswers: attempt.incorrectAnswers,
+                totalQuestions: attempt.totalQuestions,
+                timeTaken: attempt.timeTaken,
+                completedAt: attempt.createdAt
+            },
+            questions: questionResults
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch attempt details", error: error.message });
+    }
+};
+

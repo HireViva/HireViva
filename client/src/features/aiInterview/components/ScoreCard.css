@@ -1,0 +1,88 @@
+.score-card {
+    padding: 24px;
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.score-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px var(--shadow);
+    border-color: var(--primary);
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.score-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.score-grade {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.grade {
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.grade-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.score-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.score-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.score-progress {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+
+.score-progress.primary {
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+}
+
+.score-progress.success {
+    background: linear-gradient(90deg, var(--success), #34d399);
+}
+
+.score-progress.warning {
+    background: linear-gradient(90deg, var(--warning), #fbbf24);
+}
+
+.score-progress.secondary {
+    background: linear-gradient(90deg, var(--secondary), #f472b6);
+}
