@@ -111,11 +111,11 @@ export default function AptitudeMockTestDashboard() {
                 </div>
 
                 <div className="relative z-10 max-w-6xl mx-auto">
-                    <header className="mb-12">
+                    <header className="mb-6">
                         <motion.h1
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent"
+                            className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent"
                         >
                             Aptitude Mock Tests
                         </motion.h1>
@@ -123,7 +123,7 @@ export default function AptitudeMockTestDashboard() {
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-lg text-muted-foreground"
+                            className="text-sm text-muted-foreground"
                         >
                             Test your aptitude skills and prepare for placement tests with our curated mock tests.
                         </motion.p>
@@ -132,7 +132,7 @@ export default function AptitudeMockTestDashboard() {
                     {loading ? (
                         <div className="text-center text-muted-foreground">Loading tests...</div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {tests.map((test, index) => {
                                 const attempt = userAttempts[test.id];
                                 const isCompleted = !!attempt;
@@ -142,87 +142,77 @@ export default function AptitudeMockTestDashboard() {
                                         key={test.id}
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        whileHover={{ y: -5 }}
-                                        transition={{ delay: index * 0.1 }}
+                                        whileHover={{ y: -3 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="h-[220px]"
                                     >
-                                        <div className={`h-full p-6 rounded-2xl bg-card border transition-all duration-300 shadow-lg ${isCompleted
-                                            ? 'border-green-500/50 hover:border-green-500/80 hover:shadow-green-500/10'
-                                            : 'border-border/50 hover:border-primary/50 hover:shadow-primary/10'
+                                        <div className={`h-full flex flex-col p-4 rounded-2xl bg-card border transition-all duration-300 ${isCompleted
+                                            ? 'border-green-500/40 hover:border-green-500/70'
+                                            : 'border-border/50 hover:border-primary/60'
                                             }`}>
-                                            <div className="flex items-start justify-between mb-6">
-                                                <div className={`p-3 rounded-xl transition-colors ${isCompleted
-                                                    ? 'bg-green-500/10 text-green-500'
-                                                    : 'bg-primary/10 text-primary'
-                                                    }`}>
-                                                    {isCompleted ? <CheckCircle size={24} /> : <BookOpen size={24} />}
+
+                                            {/* Top Row: Icon + Badge */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className={`p-2 rounded-lg ${isCompleted ? 'bg-green-500/15 text-green-400' : 'bg-primary/15 text-primary'}`}>
+                                                    {isCompleted ? <CheckCircle size={18} /> : <BookOpen size={18} />}
                                                 </div>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${isCompleted
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : 'bg-secondary text-secondary-foreground'
-                                                    }`}>
-                                                    {isCompleted ? 'Completed' : 'Free'}
-                                                </span>
-                                            </div>
-
-                                            <h3 className={`text-xl font-semibold mb-2 transition-colors ${isCompleted ? 'text-green-400' : 'group-hover:text-primary'
-                                                }`}>
-                                                {test.title}
-                                            </h3>
-                                            <p className="text-muted-foreground text-sm mb-4">
-                                                {test.description}
-                                            </p>
-
-                                            {/* Score Display for Completed Tests */}
-                                            {isCompleted && (
-                                                <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/30">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-sm text-muted-foreground">Your Score</span>
-                                                        <span className="text-lg font-bold text-green-400">
-                                                            {attempt.correctAnswers}/{attempt.totalQuestions} ({attempt.percentage}%)
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs">
-                                                        <span className="text-muted-foreground">Attempts</span>
-                                                        <span className="text-primary font-medium">
-                                                            {attempt.attemptNumber} {attempt.attemptNumber === 1 ? 'attempt' : 'attempts'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Clock size={16} />
-                                                    <span>~30 mins</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                        <Clock size={12} /> 30 min
+                                                    </span>
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isCompleted ? 'bg-green-500/20 text-green-400' : 'bg-primary/20 text-primary'}`}>
+                                                        {isCompleted ? 'Done' : 'Free'}
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            {/* Action Buttons */}
-                                            {isCompleted ? (
-                                                <div className="flex gap-2">
+                                            {/* Middle: Title + Content */}
+                                            <div className="flex-1 min-h-0">
+                                                <h3 className={`text-sm font-bold mb-1 leading-snug ${isCompleted ? 'text-green-400' : 'text-foreground'}`}>
+                                                    {test.title}
+                                                </h3>
+                                                {isCompleted ? (
+                                                    <div className="flex items-center gap-3 mt-1">
+                                                        <span className="text-xs text-muted-foreground">Score:</span>
+                                                        <span className="text-sm font-bold text-green-400">
+                                                            {attempt.correctAnswers}/{attempt.totalQuestions}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground">({attempt.percentage}%)</span>
+                                                        <span className="ml-auto text-xs text-muted-foreground">{attempt.attemptNumber} attempt{attempt.attemptNumber !== 1 ? 's' : ''}</span>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                                                        {test.description}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {/* Bottom: Action Buttons */}
+                                            <div className="mt-3">
+                                                {isCompleted ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleViewResults(attempt.attemptId)}
+                                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium text-xs border border-primary/20"
+                                                        >
+                                                            <Eye size={13} /> View Results
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleReAttempt(test.id)}
+                                                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-muted/60 text-foreground hover:bg-muted transition-colors font-medium text-xs border border-border/40"
+                                                        >
+                                                            <RotateCcw size={13} /> Retry
+                                                        </button>
+                                                    </div>
+                                                ) : (
                                                     <button
-                                                        onClick={() => handleViewResults(attempt.attemptId)}
-                                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium text-sm"
+                                                        onClick={() => handleStartTest(test.id)}
+                                                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-semibold text-xs"
                                                     >
-                                                        <Eye size={16} />
-                                                        View Results
+                                                        Start Test <ArrowRight size={13} />
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleReAttempt(test.id)}
-                                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors font-medium text-sm"
-                                                    >
-                                                        <RotateCcw size={16} />
-                                                        Re-attempt
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={() => handleStartTest(test.id)}
-                                                    className="flex items-center text-primary font-medium text-sm hover:translate-x-1 transition-transform bg-transparent border-none cursor-pointer p-0"
-                                                >
-                                                    Start Test <ArrowRight size={16} className="ml-1" />
-                                                </button>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
                                     </motion.div>
                                 );

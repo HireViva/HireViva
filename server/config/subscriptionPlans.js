@@ -10,10 +10,10 @@ export const SUBSCRIPTION_PLANS = {
         priceInPaise: 0,
         currency: 'INR',
         mockTestsLimit: 2,
-        aiInterviewLimit: 1,
+        aiInterviewLimit: 10,
         features: [
             '2 Mock Tests',
-            '1 AI Interview',
+            '10 AI Interviews',
             'Basic Analytics'
         ]
     },

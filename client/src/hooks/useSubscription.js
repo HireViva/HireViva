@@ -36,12 +36,12 @@ export const useSubscription = () => {
 
     const canAccessMockTest = () => {
         if (!subscription) return false;
-        return subscription.mockTests.remaining > 0 || subscription.mockTests.remaining === Infinity;
+        return subscription.mockTests.remaining > 0 || subscription.mockTests.remaining === 'unlimited';
     };
 
     const canAccessAIInterview = () => {
         if (!subscription) return false;
-        return subscription.aiInterviews.remaining > 0 || subscription.aiInterviews.remaining === Infinity;
+        return subscription.aiInterviews.remaining > 0 || subscription.aiInterviews.remaining === 'unlimited';
     };
 
     const refresh = () => {

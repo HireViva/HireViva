@@ -16,6 +16,22 @@ export default {
         sans: ['Inter', 'sans-serif'],
         display: ['Poppins', 'sans-serif'],
       },
+      fontSize: {
+        // Scaled-down typography — each size is ~1 step smaller than Tailwind default
+        'xs':   ['0.7rem',   { lineHeight: '1rem' }],
+        'sm':   ['0.8rem',   { lineHeight: '1.25rem' }],
+        'base': ['0.875rem', { lineHeight: '1.5rem' }],
+        'lg':   ['1rem',     { lineHeight: '1.75rem' }],
+        'xl':   ['1.125rem', { lineHeight: '1.75rem' }],
+        '2xl':  ['1.25rem',  { lineHeight: '1.75rem' }],
+        '3xl':  ['1.5rem',   { lineHeight: '2rem' }],
+        '4xl':  ['1.875rem', { lineHeight: '2.25rem' }],
+        '5xl':  ['2.25rem',  { lineHeight: '2.5rem' }],
+        '6xl':  ['2.75rem',  { lineHeight: '1.1' }],
+        '7xl':  ['3.25rem',  { lineHeight: '1.1' }],
+        '8xl':  ['4rem',     { lineHeight: '1' }],
+        '9xl':  ['5rem',     { lineHeight: '1' }],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

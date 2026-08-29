@@ -24,7 +24,7 @@ export const getBackendBaseUrl = () => {
     return `${protocol}//${host}`;
   }
 
-  return 'http://localhost:5009';
+  return 'http://localhost:5000';
 };
 
 export const getApiBaseUrl = () => `${getBackendBaseUrl()}/api`;

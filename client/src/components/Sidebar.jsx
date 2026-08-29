@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../api";
 
 const menuSections = [
   {
@@ -172,27 +173,105 @@ export default function Sidebar() {
 }
 
 function SidebarContent({ animate = true, onItemClick }) {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleEditClick = () => {
+    if (user) {
+      setEditName(user.name);
+      setIsEditing(true);
+    }
+  };
+
+  const handleSaveName = async () => {
+    if (!editName.trim() || editName.trim() === user.name) {
+      setIsEditing(false);
+      return;
+    }
+    
+    setIsUpdating(true);
+    try {
+      const response = await api.put("/user/name", { name: editName.trim() });
+      if (response.data.success) {
+        setUser({ ...user, name: editName.trim() });
+      }
+    } catch (error) {
+      console.error("Failed to update name", error);
+    } finally {
+      setIsUpdating(false);
+      setIsEditing(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSaveName();
+    if (e.key === "Escape") setIsEditing(false);
+  };
 
   const Wrapper = animate ? motion.div : 'div';
   const wrapperProps = animate ? { variants: itemVariants } : {};
 
+  // Randomize avatar based on user's email/name
+  const avatarSeed = user ? user.email || user.name : 'guest';
+  const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+
   return (
     <>
-      {/* User Info */}
+      {/* Beautiful Profile Banner */}
       <Wrapper
         {...wrapperProps}
-        className="flex flex-col gap-1 mb-8 mt-2 p-3 rounded-xl bg-sidebar-accent/30 border border-sidebar-border/30"
+        className="relative flex items-center gap-3 mb-8 mt-2 p-3 rounded-2xl bg-gradient-to-br from-sidebar-accent/50 to-sidebar-accent/10 border border-sidebar-border/50 shadow-sm overflow-hidden group"
       >
-        <span className="text-foreground font-semibold text-sm truncate">
-          {user ? user.name : 'Guest'}
-        </span>
-        <span className="text-muted-foreground text-xs truncate">
-          {user ? user.email : 'Not logged in'}
-        </span>
-      </Wrapper>
+        {/* Glow effect behind banner */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Profile Picture */}
+        <div className="relative shrink-0 w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 bg-background/50 shadow-inner z-10">
+          <img 
+            src={avatarUrl} 
+            alt="Profile" 
+            className="w-full h-full object-cover"
+          />
+        </div>
 
-      {/* Menu Sections */}
+        {/* User Details */}
+        <div className="flex-1 min-w-0 z-10">
+          {isEditing ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleSaveName}
+                disabled={isUpdating}
+                className="w-full bg-background/50 border border-primary/30 text-foreground text-sm font-semibold rounded px-1.5 py-0.5 outline-none focus:border-primary/60 transition-colors"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-foreground font-semibold text-sm truncate">
+                {user ? user.name : 'Guest'}
+              </span>
+              {user && (
+                <button 
+                  onClick={handleEditClick}
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-foreground/10 rounded transition-all shrink-0 text-muted-foreground hover:text-foreground"
+                  title="Edit Name"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+              )}
+            </div>
+          )}
+          <span className="block text-muted-foreground text-xs truncate mt-0.5">
+            {user ? user.email : 'Not logged in'}
+          </span>
+        </div>
+      </Wrapper>
       {menuSections.map((section) => (
         <Wrapper key={section.title} {...wrapperProps} className="mb-6">
           <h3 className="text-xs font-semibold text-muted-foreground mb-3 tracking-wider">

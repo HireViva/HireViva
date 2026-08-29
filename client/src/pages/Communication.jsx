@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, ArrowLeft, Video, Sparkles } from 'lucide-react';
 import { YOUTUBE_LINKS } from '@/data/videoConfig';
+import Sidebar from '@/components/Sidebar';
 
 /**
  * Extracts YouTube video ID from various URL formats
@@ -168,12 +169,14 @@ const Communication = () => {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Ambient Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb absolute top-0 left-1/4 w-96 h-96 bg-primary/20" />
-        <div className="glow-orb absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20" style={{ animationDelay: '1s' }} />
-      </div>
+    <div className="min-h-screen bg-background flex w-full">
+      <Sidebar />
+      <div className="relative flex-1 lg:ml-64 overflow-x-hidden bg-background">
+        {/* Ambient Background Effects */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="glow-orb absolute top-0 left-1/4 w-96 h-96 bg-primary/20" />
+          <div className="glow-orb absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20" style={{ animationDelay: '1s' }} />
+        </div>
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-background/50">
@@ -239,6 +242,7 @@ const Communication = () => {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 };

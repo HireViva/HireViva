@@ -4,20 +4,20 @@
 
 .module-breakdown h3 {
   color: #ffffff;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .module-breakdown .subtitle {
   color: #a0a0a0;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
+  font-size: 0.72rem;
+  margin-bottom: 1rem;
 }
 
 .breakdown-content {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
   justify-content: space-between;
 }
@@ -63,13 +63,13 @@
 
 .item-label {
   color: #e0e0e0;
-  font-size: 0.95rem;
+  font-size: 0.78rem;
 }
 
 .item-value {
   color: #ffffff;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.82rem;
 }
 
 @media (max-width: 768px) {

@@ -184,11 +184,11 @@ export default function HeroSection() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 max-w-4xl text-center px-4"
+          className="relative z-10 max-w-7xl w-full text-center px-4 md:px-8"
         >
           <motion.p
             variants={fadeUpVariants}
-            className="brand-text text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-glow via-cyan-accent to-pink-500 bg-clip-text text-transparent"
+            className="brand-text text-6xl sm:text-7xl lg:text-8xl font-bold mb-4 bg-gradient-to-r from-purple-glow via-cyan-accent to-pink-500 bg-clip-text text-transparent"
             animate={{
               backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               scale: [1, 1.02, 1],
@@ -221,7 +221,7 @@ export default function HeroSection() {
 
           <motion.p
             variants={fadeUpVariants}
-            className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
+            className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-10 max-w-4xl mx-auto"
           >
             A complete learning ecosystem for engineering students — combining AI interviews, coding practice, core subjects, aptitude, communication skills, progress tracking, and expert guidance to help you learn smarter and succeed faster.
           </motion.p>
